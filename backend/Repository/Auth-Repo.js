@@ -52,6 +52,17 @@ const addClass = (name, description, startYear, endYear, callback) => {
     });
 };
 
+const getClassById = (id, callback) => {
+    const sql = 'SELECT * FROM classes WHERE id = ?';
+    pool.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Error fetching class details:', err);
+            callback(err);
+        } else {
+            callback(null, result[0]);
+        }
+    });
+};
 
 const getClasses = (callback) => {
     const sql = 'SELECT * FROM classes';
@@ -78,13 +89,12 @@ const addStudent = (name, email, classId, callback) => {
     });
 };
 
-
-
 module.exports = {
     addUser,
     getUserByEmail,
     getUsers,
     addClass,
     getClasses,
+    getClassById,
     addStudent
 };

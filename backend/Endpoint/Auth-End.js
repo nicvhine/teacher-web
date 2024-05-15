@@ -68,6 +68,18 @@ router.post('/class', (req, res) => {
     });
 });
 
+router.get('/class/:id', (req, res) => {
+    const { id } = req.params;
+    taskRepo.getClassById(id, (err, classDetails) => {
+        if (err) {
+            console.error('Failed to fetch class details:', err);
+            res.status(500).json({ error: 'Failed to fetch class details' });
+        } else {
+            res.json(classDetails);
+        }
+    });
+});
+
 router.get('/class', (req, res) => {
     taskRepo.getClasses((err, classes) => {
         if (err) {

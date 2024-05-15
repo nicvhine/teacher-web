@@ -1,36 +1,56 @@
+/* Dashboard.css */
+
+/* Center the main container */
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust as needed */
+}
+
+/* Style the side navbar */
 .side-navbar {
-    background-color: #333;
-    color: #fff;
-    width: 200px;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-  }
-  
-  .side-navbar ul {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-  }
-  
-  .side-navbar ul li {
-    margin-bottom: 10px;
-  }
-  
-  .side-navbar ul li a {
-    color: #fff;
-    text-decoration: none;
-    display: block;
-    padding: 10px;
-  }
-  
-  .side-navbar ul li a:hover {
-    background-color: #555;
-  }
-  
-  .main-content {
-    margin-left: 200px; 
-    padding: 20px;
-  }
-  
+  background-color: #333; /* Example background color */
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Example shadow */
+}
+
+.side-navbar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.side-navbar li {
+  margin-bottom: 10px;
+}
+
+.side-navbar li a {
+  text-decoration: none;
+  color: white; /* Example link color */
+}
+
+.side-navbar li a:hover {
+  color: #ffd700; /* Example hover color */
+}
+
+/* Style the main content */
+.main-content {
+  margin-left: 20px; /* Example margin */
+}
+
+/* Style the class information section */
+.class-info {
+  background-color: #f5f5f5; /* Example background color */
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Example shadow */
+}
+
+.class-info h2 {
+  margin-bottom: 10px;
+}
+
+.class-info p {
+  margin-bottom: 5px;
+}
