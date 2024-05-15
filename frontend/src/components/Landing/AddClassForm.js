@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SERVER_URL } from "../../Url";
-import "./AddClassForm.css"; 
+import "./AddClassForm.css";
 
-const AddClassForm = ({ onClassAdded }) => {
+const Class = ({ onClassAdded }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [startYear, setStartYear] = useState('');
@@ -41,14 +41,20 @@ const AddClassForm = ({ onClassAdded }) => {
       setStartYear('');
       setEndYear('');
       setErrorMessage('');
-      fetchClasses(); // Fetch classes after adding a new class
+      fetchClasses(); 
     } catch (error) {
       console.error('Error adding class:', error);
     }
   };
 
+  const handleClassItemClick = (classId) => {
+
+    window.location.href = `/dashboard/${classId}`;
+    console.log(`Clicked on class with ID: ${classId}`);
+  };
+
   return (
-    <div>
+    <div className="AddClassForm-container">
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -82,10 +88,12 @@ const AddClassForm = ({ onClassAdded }) => {
         <ul>
           {classes.map((classItem) => (
             <li key={classItem.id}>
-              <div>Name: {classItem.name}</div>
-              <div>Description: {classItem.description}</div>
-              <div>Start Year: {classItem.startYear}</div>
-              <div>End Year: {classItem.endYear}</div>
+              <button onClick={() => handleClassItemClick(classItem.id)}>
+                <div>Name: {classItem.name}</div>
+                <div>Description: {classItem.description}</div>
+                <div>Start Year: {classItem.startYear}</div>
+                <div>End Year: {classItem.endYear}</div>
+              </button>
             </li>
           ))}
         </ul>
@@ -94,4 +102,4 @@ const AddClassForm = ({ onClassAdded }) => {
   );
 };
 
-export default AddClassForm;
+export default Class;

@@ -1,0 +1,36 @@
+.side-navbar {
+    background-color: #333;
+    color: #fff;
+    width: 200px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+  
+  .side-navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .side-navbar ul li {
+    margin-bottom: 10px;
+  }
+  
+  .side-navbar ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+  }
+  
+  .side-navbar ul li a:hover {
+    background-color: #555;
+  }
+  
+  .main-content {
+    margin-left: 200px; 
+    padding: 20px;
+  }
+  

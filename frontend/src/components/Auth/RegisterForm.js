@@ -8,14 +8,12 @@ const RegisterForm = ({ onUserAdded }) => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
-  //initialize to be empty strings
 
   const handleSubmit = async () => {
     try {
       if (!email.trim() || !username.trim() || !password.trim())  {
         setErrorMessage("Title and description cannot be empty.");
         return; 
-        //error message is shown when fields are null
       }
 
       await axios.post(`${SERVER_URL}/api/users`, { email, username, password });
@@ -25,10 +23,8 @@ const RegisterForm = ({ onUserAdded }) => {
       setUsername('');
       setPassword('');
       setErrorMessage("");
-      //resets all fields 
       
       setShowPopup(true);
-      //task added successfully pops up
 
     } catch (error) {
       console.error('Error adding user:', error);

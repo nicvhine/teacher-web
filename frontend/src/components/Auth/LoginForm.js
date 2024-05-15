@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Navigate } from 'react-router-dom'; // Import Navigate
+import { Navigate } from 'react-router-dom'; 
 import { SERVER_URL } from '../../Url';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [loggedIn, setLoggedIn] = useState(false); // State to track login status
+    const [loggedIn, setLoggedIn] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,13 +24,10 @@ const LoginForm = () => {
             });
 
             if (response.status === 200) {
-                // Login successful
                 const userData = response.data.user;
                 console.log('Login successful:', userData);
-                // Update loggedIn state to true
                 setLoggedIn(true);
             } else {
-                // Login failed
                 console.error('Login failed:', response.data.error);
                 setErrorMessage('Login failed. Please check your credentials.');
             }
@@ -40,9 +37,8 @@ const LoginForm = () => {
         }
     };
 
-    // Redirect to LoginLanding if loggedIn is true
     if (loggedIn) {
-        return <Navigate to="/Login-landing" />;
+        return <Navigate to="/class" />;
     }
 
     return (

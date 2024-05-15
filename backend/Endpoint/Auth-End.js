@@ -1,8 +1,8 @@
-// backend/endpoint/Auth-End.js
 const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
 
+// USER
 router.get('/users', (req, res) => {
     taskRepo.getUsers((err, users) => {
         if (err) {
@@ -51,10 +51,11 @@ router.post('/login', (req, res) => {
     });
 });
 
+// CLASS
 router.post('/class', (req, res) => {
     const { name, description, startYear, endYear } = req.body;
     if (!name || !description || !startYear || !endYear) {
-        return res.status(400).json({ error: 'Email, username, and password are required' });
+        return res.status(400).json({ error: 'Name, description, startYear, and endYear are required' });
     }
 
     taskRepo.addClass(name, description, startYear, endYear, (err, result) => {
@@ -68,12 +69,30 @@ router.post('/class', (req, res) => {
 });
 
 router.get('/class', (req, res) => {
-    taskRepo.getClasses((err, users) => {
+    taskRepo.getClasses((err, classes) => {
         if (err) {
             console.error('Failed to fetch classes:', err);
-            res.status(500).json({ error: 'Failed to fetch users' });
+            res.status(500).json({ error: 'Failed to fetch classes' });
         } else {
-            res.json(users);
+            res.json(classes);
+        }
+    });
+});
+
+// STUDENT
+router.post('/:classId/students', (req, res) => {
+    const { classId } = req.params;
+    const { name, email } = req.body;
+    if (!name || !email) {
+        return res.status(400).json({ error: 'Name and email are required' });
+    }
+
+    taskRepo.addStudent(name, email, classId, (err, result) => {
+        if (err) {
+            console.error('Failed to add student:', err);
+            res.status(500).json({ error: 'Failed to add student' });
+        } else {
+            res.status(201).json({ message: 'Student added successfully' });
         }
     });
 });

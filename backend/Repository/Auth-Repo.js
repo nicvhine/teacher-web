@@ -1,6 +1,6 @@
-// backend/repository/Auth-Repo.js
 const pool = require('../Database');
 
+// USER
 const addUser = (email, username, password, callback) => {
     const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';
     pool.query(sql, [email, username, password], (err, result) => {
@@ -33,12 +33,13 @@ const getUserByEmail = (email, callback) => {
             return callback(err);
         }
         if (results.length === 0) {
-            return callback(null, null); // User not found
+            return callback(null, null); 
         }
-        callback(null, results[0]); // Return the user object
+        callback(null, results[0]); 
     });
 };
 
+// CLASS
 const addClass = (name, description, startYear, endYear, callback) => {
     const sql = 'INSERT INTO classes (name, description, startYear, endYear) VALUES (?, ?, ?, ?)';
     pool.query(sql, [name, description, startYear, endYear], (err, result) => {
@@ -64,10 +65,26 @@ const getClasses = (callback) => {
     });
 };
 
+// Student List
+const addStudent = (name, email, classId, callback) => {
+    const sql = 'INSERT INTO students (name, email, classId) VALUES (?, ?, ?)';
+    pool.query(sql, [name, email, classId], (err, result) => {
+        if (err) {
+            console.error('Error adding student:', err);
+            callback(err);
+        } else {
+            callback(null, result);
+        }
+    });
+};
+
+
+
 module.exports = {
     addUser,
     getUserByEmail,
     getUsers,
     addClass,
-    getClasses
+    getClasses,
+    addStudent
 };
