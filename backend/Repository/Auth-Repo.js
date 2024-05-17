@@ -76,12 +76,49 @@ const getClasses = (callback) => {
     });
 };
 
+const updateClass = (id, name, description, startYear, endYear, callback) => {
+    const sql = 'UPDATE classes SET name = ?, description = ?, startYear = ?, endYear = ? WHERE id = ?';
+    pool.query(sql, [name, description, startYear, endYear, id], (err, result) => {
+        if (err) {
+            console.error('Error updating class:', err);
+            callback(err);
+        } else {
+            callback(null, result);
+        }
+    });
+};
+
 // Student List
 const addStudent = (name, email, classId, callback) => {
     const sql = 'INSERT INTO students (name, email, classId) VALUES (?, ?, ?)';
     pool.query(sql, [name, email, classId], (err, result) => {
         if (err) {
             console.error('Error adding student:', err);
+            callback(err);
+        } else {
+            callback(null, result);
+        }
+    });
+};
+
+const getStudentsForClass = (classId, callback) => {
+    const sql = 'SELECT * FROM students WHERE classId = ?';
+    pool.query(sql, [classId], (err, results) => {
+        if (err) {
+            console.error('Error fetching students for class:', err);
+            callback(err);
+        } else {
+            callback(null, results);
+        }
+    });
+};
+
+//UPDATE STUDENT STATUS
+const updateStudentStatus = (studentId, status, callback) => {
+    const sql = 'UPDATE students SET status = ? WHERE id = ?';
+    pool.query(sql, [status, studentId], (err, result) => {
+        if (err) {
+            console.error('Error updating student status:', err);
             callback(err);
         } else {
             callback(null, result);
@@ -96,5 +133,8 @@ module.exports = {
     addClass,
     getClasses,
     getClassById,
-    addStudent
+    addStudent,
+    getStudentsForClass,
+    updateClass,
+    updateStudentStatus
 };

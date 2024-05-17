@@ -91,8 +91,41 @@ router.get('/class', (req, res) => {
     });
 });
 
+
+// Update class details
+router.put('/class/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, description, startYear, endYear } = req.body;
+    if (!name || !description || !startYear || !endYear) {
+        return res.status(400).json({ error: 'Name, description, startYear, and endYear are required' });
+    }
+
+    taskRepo.getClassById(id, (err, classDetails) => {
+        if (err) {
+            console.error('Error fetching class details:', err);
+            return res.status(500).json({ error: 'Failed to fetch class details' });
+        }
+        if (!classDetails) {
+            return res.status(404).json({ error: 'Class not found' });
+        }
+        
+        if (classDetails.userId !== req.user.id) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
+        taskRepo.updateClass(id, name, description, startYear, endYear, (err, result) => {
+            if (err) {
+                console.error('Failed to update class:', err);
+                res.status(500).json({ error: 'Failed to update class' });
+            } else {
+                res.status(200).json({ message: 'Class updated successfully' });
+            }
+        });
+    });
+});
+
 // STUDENT
-router.post('/:classId/students', (req, res) => {
+router.post('/class/:classId/students', (req, res) => {
     const { classId } = req.params;
     const { name, email } = req.body;
     if (!name || !email) {
@@ -105,6 +138,37 @@ router.post('/:classId/students', (req, res) => {
             res.status(500).json({ error: 'Failed to add student' });
         } else {
             res.status(201).json({ message: 'Student added successfully' });
+        }
+    });
+});
+
+router.get('/class/:classId/students', (req, res) => {
+    const { classId } = req.params;
+    taskRepo.getStudentsForClass(classId, (err, students) => {
+        if (err) {
+            console.error('Failed to fetch students:', err);
+            res.status(500).json({ error: 'Failed to fetch students' });
+        } else {
+            res.json(students);
+        }
+    });
+});
+
+// Update student status
+
+router.put('/class/:classId/students/:studentId/status', (req, res) => {
+    const { classId, studentId } = req.params; 
+    const { status } = req.body;
+    if (!status) {
+        return res.status(400).json({ error: 'Status is required' });
+    }
+
+    taskRepo.updateStudentStatus(studentId, status, (err, result) => {
+        if (err) {
+            console.error('Failed to update student status:', err);
+            res.status(500).json({ error: 'Failed to update student status' });
+        } else {
+            res.status(200).json({ message: 'Student status updated successfully' });
         }
     });
 });

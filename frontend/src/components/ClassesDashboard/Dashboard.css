@@ -1,19 +1,15 @@
-/* Dashboard.css */
-
-/* Center the main container */
 .dashboard-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Adjust as needed */
+  height: 100vh; 
 }
 
-/* Style the side navbar */
 .side-navbar {
-  background-color: #333; /* Example background color */
+  background-color: #333; 
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Example shadow */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .side-navbar ul {
@@ -23,28 +19,27 @@
 
 .side-navbar li {
   margin-bottom: 10px;
+
 }
 
 .side-navbar li a {
   text-decoration: none;
-  color: white; /* Example link color */
+  color: white;
 }
 
 .side-navbar li a:hover {
-  color: #ffd700; /* Example hover color */
+  color: #ffd700;
 }
 
-/* Style the main content */
 .main-content {
-  margin-left: 20px; /* Example margin */
+  margin-left: 20px; 
 }
 
-/* Style the class information section */
 .class-info {
-  background-color: #f5f5f5; /* Example background color */
+  background-color: #f5f5f5; 
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Example shadow */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .class-info h2 {

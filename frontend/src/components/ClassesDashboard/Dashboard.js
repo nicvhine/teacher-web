@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 import { SERVER_URL } from "../../Url";
+import { Card } from "react-bootstrap";
 
 const Dashboard = () => {
   const { classId } = useParams();
@@ -27,6 +28,12 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <nav className="side-navbar">
         <ul>
+          <h1 style={{marginBottom: '30%'}}>EduTech</h1>
+          {classId && (
+            <li>
+              <Link to={`/dashboard/${classId}`}>Dashboard</Link>
+            </li>
+          )}
           {classId && (
             <li>
               <Link to={`/dashboard/${classId}/students`}>Student List</Link>
@@ -52,21 +59,9 @@ const Dashboard = () => {
           </li>
         </ul>
       </nav>
-      <div className="main-content">
-        <div className="class-info">
-          {classInfo ? (
-            <>
-              <h2>Class Information</h2>
-              <p>Class Name: {classInfo.name}</p>
-              <p>Class ID: {classId}</p>
-            </>
-          ) : (
-            <p>Loading class information...</p>
-          )}
-        </div>
       </div>
-    </div>
   );
 };
+
 
 export default Dashboard;

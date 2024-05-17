@@ -10,52 +10,81 @@ const StudentList = ({ onStudentAdded }) => {
   const [email, setEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [students, setStudents] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/class/${classId}/students`);
+        setStudents(response.data); 
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    };
+
+    fetchStudents();
   }, [classId]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
-      const trimmedName = name.trim();
-      const trimmedEmail = email.trim();
-
-      if (!trimmedName || !trimmedEmail) {
-        setErrorMessage('Name and email are required.');
+      if (!name.trim() || !email.trim()) {
+        setErrorMessage('Name and email cannot be empty.');
         return;
       }
 
-      await axios.post(`${SERVER_URL}/api/class/${classId}/students`, { name: trimmedName, email: trimmedEmail }); 
-      console.log('Student added successfully');
+      await axios.post(`${SERVER_URL}/api/class/${classId}/students`, {
+        name,
+        email
+      });
+
+
+      console.log("Student added successfully");
       onStudentAdded();
-      setName('');
-      setEmail('');
-      setErrorMessage('');
+      setName("");
+      setEmail("");
+      setErrorMessage("");
+
+      setShowPopup(true);
     } catch (error) {
-      console.error('Error adding student:', error);
-      setErrorMessage('Failed to add student. Please try again later.');
+      console.error("Error adding student:", error);
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'name') {
-      setName(value);
-    } else if (name === 'email') {
-      setEmail(value);
+  const toggleStatus = (studentId, currentStatus) => {
+    console.log("Toggling status for studentId:", studentId);
+    console.log("Current status:", currentStatus);
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    console.log("New status:", newStatus);
+    handleStatusChange(studentId, newStatus);
+};
+
+
+  const handleStatusChange = async (studentId, newStatus) => {
+    try {
+      await axios.put(`${SERVER_URL}/api/class/${classId}/students/${studentId}`, {
+        status: newStatus
+      });
+
+      setStudents(prevStudents =>
+        prevStudents.map(student =>
+          student.id === studentId ? { ...student, status: newStatus } : student
+        )
+      );
+    } catch (error) {
+      console.error("Error updating student status:", error);
     }
   };
-
+  
   return (
     <div>
       <nav className="side-navbar">
         <ul>
+          <li><Link to={`/dashboard/${classId}`}>Dashboard</Link></li>
           <li><Link to={`/dashboard/${classId}/students`}>Student List</Link></li>
           <li><Link to={`/dashboard/${classId}/announcement`}>Announcement</Link></li>
           <li><Link to={`/dashboard/${classId}/attendance`}>Attendance</Link></li>
           <li><Link to={`/dashboard/${classId}/edit-class`}>Edit Class Details</Link></li>
-          <li><Link to="/logout">Logout</Link></li>
+          <li><Link to="/">Logout</Link></li>
         </ul>
       </nav>
       <div className="studentList-content">
@@ -66,14 +95,14 @@ const StudentList = ({ onStudentAdded }) => {
             name="name"
             placeholder="Name"
             value={name}
-            onChange={handleInputChange}
+            onChange={(e) => setName(e.target.value)}
           />
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={email}
-            onChange={handleInputChange}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <button type="submit">Add Student</button>
         </form>
@@ -94,7 +123,14 @@ const StudentList = ({ onStudentAdded }) => {
                 <td>{student.id}</td>
                 <td>{student.name}</td>
                 <td>{student.email}</td>
-                <td>{student.status}</td>
+                <td>
+                  <span 
+                  className={student.status === 'active' ? 'status-active' : 'status-inactive'}
+                  onClick={() => toggleStatus(student.id, student.status)}
+                  >
+                    {student.status}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -105,3 +141,4 @@ const StudentList = ({ onStudentAdded }) => {
 };
 
 export default StudentList;
+
