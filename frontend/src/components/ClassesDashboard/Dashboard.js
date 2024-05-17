@@ -26,7 +26,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <nav className="side-navbar">
+      <nav className="side-navbar" style={{backgroundColor: "#333"}}>
         <ul>
           <h1 style={{marginBottom: '30%'}}>EduTech</h1>
           {classId && (
@@ -41,11 +41,6 @@ const Dashboard = () => {
           )}
           {classId && (
             <li>
-              <Link to={`/dashboard/${classId}/announcement`}>Announcement</Link>
-            </li>
-          )}
-          {classId && (
-            <li>
               <Link to={`/dashboard/${classId}/attendance`}>Attendance</Link>
             </li>
           )}
@@ -55,7 +50,7 @@ const Dashboard = () => {
             </li>
           )}
           <li>
-            <Link to="/logout">Logout</Link>
+            <Link to="/">Logout</Link>
           </li>
         </ul>
       </nav>

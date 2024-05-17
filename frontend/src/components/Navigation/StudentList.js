@@ -3,14 +3,17 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { SERVER_URL } from "../../Url";
 import './Navigation.css'; 
+import Sidebar from "../ClassesDashboard/Dashboard";
 
 const StudentList = ({ onStudentAdded }) => {
   const { classId } = useParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
   const [errorMessage, setErrorMessage] = useState('');
   const [students, setStudents] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -37,13 +40,11 @@ const StudentList = ({ onStudentAdded }) => {
         email
       });
 
-
       console.log("Student added successfully");
       onStudentAdded();
       setName("");
       setEmail("");
       setErrorMessage("");
-
       setShowPopup(true);
     } catch (error) {
       console.error("Error adding student:", error);
@@ -51,17 +52,14 @@ const StudentList = ({ onStudentAdded }) => {
   };
 
   const toggleStatus = (studentId, currentStatus) => {
-    console.log("Toggling status for studentId:", studentId);
-    console.log("Current status:", currentStatus);
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-    console.log("New status:", newStatus);
     handleStatusChange(studentId, newStatus);
-};
+  };
 
 
   const handleStatusChange = async (studentId, newStatus) => {
     try {
-      await axios.put(`${SERVER_URL}/api/class/${classId}/students/${studentId}`, {
+      await axios.put(`${SERVER_URL}/api/class/${classId}/students/${studentId}/status`, {
         status: newStatus
       });
 
@@ -75,17 +73,19 @@ const StudentList = ({ onStudentAdded }) => {
     }
   };
   
+  const filteredStudents = students.filter(student => {
+    // Filter by name or email
+    const searchMatch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       student.email.toLowerCase().includes(searchQuery.toLowerCase());
+    // Filter by status
+    const statusMatch = statusFilter === 'all' || student.status === statusFilter;
+    return searchMatch && statusMatch;
+  });
+
   return (
     <div>
       <nav className="side-navbar">
-        <ul>
-          <li><Link to={`/dashboard/${classId}`}>Dashboard</Link></li>
-          <li><Link to={`/dashboard/${classId}/students`}>Student List</Link></li>
-          <li><Link to={`/dashboard/${classId}/announcement`}>Announcement</Link></li>
-          <li><Link to={`/dashboard/${classId}/attendance`}>Attendance</Link></li>
-          <li><Link to={`/dashboard/${classId}/edit-class`}>Edit Class Details</Link></li>
-          <li><Link to="/">Logout</Link></li>
-        </ul>
+        <Sidebar/>
       </nav>
       <div className="studentList-content">
         <h2>Add New Student</h2>
@@ -106,7 +106,26 @@ const StudentList = ({ onStudentAdded }) => {
           />
           <button type="submit">Add Student</button>
         </form>
+       
         <h2>Student List</h2>
+        <div className="filter-search-container">
+          <div className="search-container">
+            <input
+              style={{width: "70%"}}
+              type="text"
+              placeholder="Search by name or email"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="filter-container">
+          <select style={{marginTop: '20px', marginBottom: '20px'}}className="bg-gray-300 px-3 py-1 rounded-lg w-full lg:w-auto" onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="all">ALL</option>
+            <option value="active">ACTIVE</option>
+            <option value="inactive">INACTIVE</option>
+          </select>
+          </div>
+        </div>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
         <table>
           <thead>
@@ -118,15 +137,15 @@ const StudentList = ({ onStudentAdded }) => {
             </tr>
           </thead>
           <tbody>
-            {students.map((student) => (
+            {filteredStudents.map((student) => (
               <tr key={student.id}>
                 <td>{student.id}</td>
                 <td>{student.name}</td>
                 <td>{student.email}</td>
                 <td>
                   <span 
-                  className={student.status === 'active' ? 'status-active' : 'status-inactive'}
-                  onClick={() => toggleStatus(student.id, student.status)}
+                    style={{  cursor: "pointer", color: student.status === 'active' ? 'green' : 'red' }}
+                    onClick={() => toggleStatus(student.id, student.status)}
                   >
                     {student.status}
                   </span>
@@ -141,4 +160,3 @@ const StudentList = ({ onStudentAdded }) => {
 };
 
 export default StudentList;
-

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { SERVER_URL } from "../../Url";
 import './Navigation.css'; // Import CSS file for styling
+import Sidebar from "../ClassesDashboard/Dashboard";
 
 const UpdateDetails = () => {
     const { classId } = useParams(); // Extract classId from URL
@@ -50,14 +51,7 @@ const UpdateDetails = () => {
     return (
         <div>
             <nav className="side-navbar">
-                <ul>
-                    <li><Link to={`/dashboard/${classId}`}>Dashboard</Link></li>
-                    <li><Link to={`/dashboard/${classId}/students`}>Student List</Link></li>
-                    <li><Link to={`/dashboard/${classId}/announcement`}>Announcement</Link></li>
-                    <li><Link to={`/dashboard/${classId}/attendance`}>Attendance</Link></li>
-                    <li><Link to={`/dashboard/${classId}/edit-class`}>Edit Class Details</Link></li>
-                    <li><Link to="/">Logout</Link></li>
-                </ul>
+               <Sidebar/>
             </nav>
 
             <div className="studentList-content">

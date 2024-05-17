@@ -5,7 +5,6 @@ import RegisterForm from './components/Auth/RegisterForm';
 import Class from './components/Landing/AddClassForm';
 import Dashboard from './components/Navigation/DashboardHome';
 import StudentList from './components/Navigation/StudentList';
-import Announcement from './components/Navigation/Announcement';
 import Attendance from './components/Navigation/Attendance';
 import EditClassDetails from './components/Navigation/EditClassDetails';
 
@@ -20,7 +19,6 @@ const App = () => {
           <Route path="/class" element={<Class />} />
           <Route path="/dashboard/:classId/*" element={<Dashboard />} />
           <Route path="/dashboard/:classId/students" element={<StudentList />} />
-          <Route path="/dashboard/:classId/announcement" element={<Announcement />} />
           <Route path="/dashboard/:classId/attendance" element={<Attendance />} />
           <Route path="/dashboard/:classId/edit-class" element={<EditClassDetails />} />
         </Routes>

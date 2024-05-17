@@ -1,8 +1,13 @@
 import React from "react";
+import Sidebar from "../ClassesDashboard/Dashboard";
 
 const Attendance = () => {
     return(
-        <h1>Attendance</h1>
+        <div>
+        <nav>
+            <Sidebar/>
+        </nav>
+    </div>
     )
 }
 
