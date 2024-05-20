@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
-
+const jwt = require('jsonwebtoken');
+const authenticateToken = require('../Repository/Auth-Repo');
+const { auth } = require('firebase-admin');
 // USER
 router.get('/users', (req, res) => {
     taskRepo.getUsers((err, users) => {
@@ -30,6 +32,7 @@ router.post('/users', (req, res) => {
     });
 });
 
+
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -47,9 +50,13 @@ router.post('/login', (req, res) => {
         if (user.password !== password) {
             return res.status(401).json({ error: 'Invalid password' });
         }
-        res.status(200).json({ message: 'Login successful', user });
+
+        const token = jwt.sign({ email: user.email, id: user.id }, process.env.JWT_SECRET);
+        
+        res.status(200).json({ message: 'Login successful', token });
     });
 });
+
 
 // CLASS
 router.post('/class', (req, res) => {
@@ -68,7 +75,7 @@ router.post('/class', (req, res) => {
     });
 });
 
-router.get('/class/:id', (req, res) => {
+router.get('/class/:id',authenticateToken, (req, res) => {
     const { id } = req.params;
     taskRepo.getClassById(id, (err, classDetails) => {
         if (err) {
@@ -80,7 +87,7 @@ router.get('/class/:id', (req, res) => {
     });
 });
 
-router.get('/class', (req, res) => {
+router.get('/class',authenticateToken,(req, res) => {
     taskRepo.getClasses((err, classes) => {
         if (err) {
             console.error('Failed to fetch classes:', err);
@@ -93,7 +100,7 @@ router.get('/class', (req, res) => {
 
 
 // Update class details
-router.put('/class/:id', (req, res) => {
+router.put('/class/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
     const { name, description, startYear, endYear } = req.body;
     if (!name || !description || !startYear || !endYear) {
@@ -109,6 +116,7 @@ router.put('/class/:id', (req, res) => {
             return res.status(404).json({ error: 'Class not found' });
         }
         
+        // Check if the authenticated user is the owner of the class
         if (classDetails.userId !== req.user.id) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
@@ -124,8 +132,9 @@ router.put('/class/:id', (req, res) => {
     });
 });
 
+
 // STUDENT
-router.post('/class/:classId/students', (req, res) => {
+router.post('/class/:classId/students',authenticateToken, (req, res) => {
     const { classId } = req.params;
     const { name, email } = req.body;
     if (!name || !email) {
@@ -142,7 +151,7 @@ router.post('/class/:classId/students', (req, res) => {
     });
 });
 
-router.get('/class/:classId/students', (req, res) => {
+router.get('/class/:classId/students', authenticateToken, (req, res) => {
     const { classId } = req.params;
     taskRepo.getStudentsForClass(classId, (err, students) => {
         if (err) {
@@ -156,7 +165,7 @@ router.get('/class/:classId/students', (req, res) => {
 
 // Update student status
 
-router.put('/class/:classId/students/:studentId/status', (req, res) => {
+router.put('/class/:classId/students/:studentId/status', authenticateToken, (req, res) => {
     const { classId, studentId } = req.params; 
     const { status } = req.body;
     if (!status) {

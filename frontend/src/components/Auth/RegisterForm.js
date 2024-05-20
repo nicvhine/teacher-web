@@ -4,6 +4,7 @@ import { Navigate, Link } from "react-router-dom";
 import { SERVER_URL } from "../../Url";
 import "./Auth.scss";
 
+
 const RegisterForm = ({ onUserAdded }) => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");

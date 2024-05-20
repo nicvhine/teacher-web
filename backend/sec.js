@@ -1,0 +1,1 @@
+JWT_SECRET="3bR92H$7Pm^S8!pQdF&c"

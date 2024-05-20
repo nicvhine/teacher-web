@@ -1,5 +1,5 @@
 const pool = require('../Database');
-
+const jwt = require('jsonwebtoken');
 // USER
 const addUser = (email, username, password, callback) => {
     const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';
@@ -12,6 +12,18 @@ const addUser = (email, username, password, callback) => {
         }
     });
 };
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+}; 
 
 const getUsers = (callback) => {
     const sql = 'SELECT * FROM users';
@@ -136,5 +148,6 @@ module.exports = {
     addStudent,
     getStudentsForClass,
     updateClass,
-    updateStudentStatus
+    updateStudentStatus,
+    authenticateToken
 };

@@ -26,37 +26,31 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <nav className="side-navbar" style={{backgroundColor: "#333"}}>
-        <ul>
-          <h1 style={{marginBottom: '30%'}}>EduTech</h1>
+      <nav className="side-navbar" style={{ backgroundColor: "#333" }}>
+        <ul className="list-unstyled">
+          <h1 className="mb-4">EduTech</h1>
           {classId && (
-            <li>
-              <Link to={`/dashboard/${classId}`}>Dashboard</Link>
+            <li className="mb-3">
+              <Link className="text-white" to={`/dashboard/${classId}`}>Dashboard</Link>
             </li>
           )}
           {classId && (
-            <li>
-              <Link to={`/dashboard/${classId}/students`}>Student List</Link>
+            <li className="mb-3">
+              <Link className="text-white" to={`/dashboard/${classId}/students`}>Student List</Link>
             </li>
           )}
           {classId && (
-            <li>
-              <Link to={`/dashboard/${classId}/attendance`}>Attendance</Link>
+            <li className="mb-3">
+              <Link className="text-white" to={`/dashboard/${classId}/edit-class`}>Edit Class Details</Link>
             </li>
           )}
-          {classId && (
-            <li>
-              <Link to={`/dashboard/${classId}/edit-class`}>Edit Class Details</Link>
-            </li>
-          )}
-          <li>
-            <Link to="/">Logout</Link>
+          <li className="mb-3">
+            <Link className="text-white" to="/">Logout</Link>
           </li>
         </ul>
       </nav>
-      </div>
+    </div>
   );
 };
-
 
 export default Dashboard;

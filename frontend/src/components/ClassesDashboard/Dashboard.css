@@ -24,6 +24,7 @@
 .side-navbar li a {
   text-decoration: none;
   color: white;
+  margin-bottom: 30px;
 }
 
 .side-navbar li a:hover {
