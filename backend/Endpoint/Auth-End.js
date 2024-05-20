@@ -3,6 +3,8 @@ const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
 const jwt = require('jsonwebtoken');
 const {authenticateToken} = require('../Repository/Auth-Repo');
+const { auth } = require('firebase-admin');
+
 // USER
 router.get('/users', (req, res) => {
     taskRepo.getUsers((err, users) => {
@@ -32,7 +34,7 @@ router.post('/users', (req, res) => {
 });
 
 
-router.post('/login', (req, res) => {
+router.post('/login',authenticateToken,(req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
@@ -199,7 +201,7 @@ router.post('/folders', (req, res) => {
 });
 
 // Add File to Folder
-router.post('/files', (req, res) => {
+router.post('/files',(req, res) => {
     const { name, folder_id } = req.body;
     if (!name || !folder_id) {
         return res.status(400).json({ error: 'Name and folder_id are required' });
