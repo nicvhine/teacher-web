@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
-const jwt = require('jsonwebtoken');
-const {authenticateToken} = require('../Repository/Auth-Repo');
-const { auth } = require('firebase-admin');
 
 // USER
 router.get('/users', (req, res) => {
@@ -34,7 +31,7 @@ router.post('/users', (req, res) => {
 });
 
 
-router.post('/login',authenticateToken,(req, res) => {
+router.post('/login',(req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
@@ -51,10 +48,8 @@ router.post('/login',authenticateToken,(req, res) => {
         if (user.password !== password) {
             return res.status(401).json({ error: 'Invalid password' });
         }
-
-        const token = jwt.sign({ email: user.email, id: user.id }, process.env.JWT_SECRET);
         
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful' });
     });
 });
 
@@ -117,10 +112,6 @@ router.put('/class/:id', (req, res) => {
             return res.status(404).json({ error: 'Class not found' });
         }
         
-        // Check if the authenticated user is the owner of the class
-        if (classDetails.userId !== req.user.id) {
-            return res.status(403).json({ error: 'Unauthorized' });
-        }
 
         taskRepo.updateClass(id, name, description, startYear, endYear, (err, result) => {
             if (err) {
