@@ -38,10 +38,15 @@ const Dashboard = () => {
             <li className="mb-3">
               <Link className="text-white" to={`/dashboard/${classId}/students`}>Student List</Link>
             </li>
+          )} 
+          {classId && (
+            <li className="mb-3">
+              <Link className="text-white" to={`/dashboard/${classId}/library`}>Resource Library</Link>
+            </li>
           )}
           {classId && (
             <li className="mb-3">
-              <Link className="text-white" to={`/dashboard/${classId}/edit-class`}>Edit Class Details</Link>
+              <Link className="text-white" to={`/dashboard/${classId}/settings`}>Settings</Link>
             </li>
           )}
           <li className="mb-3">

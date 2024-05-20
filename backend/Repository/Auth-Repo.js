@@ -138,6 +138,32 @@ const updateStudentStatus = (studentId, status, callback) => {
     });
 };
 
+// Add Folder
+const addFolder = (name, callback) => {
+    const sql = 'INSERT INTO Folders (name) VALUES (?)';
+    pool.query(sql, [name], (err, result) => {
+        if (err) {
+            console.error('Error adding folder:', err);
+            callback(err);
+        } else {
+            callback(null, result);
+        }
+    });
+};
+
+// Add File
+const addFile = (name, folder_id, callback) => {
+    const sql = 'INSERT INTO Files (name, folder_id) VALUES (?, ?)';
+    pool.query(sql, [name, folder_id], (err, result) => {
+        if (err) {
+            console.error('Error adding file:', err);
+            callback(err);
+        } else {
+            callback(null, result);
+        }
+    });
+};
+
 module.exports = {
     addUser,
     getUserByEmail,
@@ -149,5 +175,7 @@ module.exports = {
     getStudentsForClass,
     updateClass,
     updateStudentStatus,
-    authenticateToken
+    authenticateToken,
+    addFile,
+    addFolder
 };

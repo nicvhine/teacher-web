@@ -6,7 +6,8 @@ import Class from './components/Landing/AddClassForm';
 import Dashboard from './components/Navigation/DashboardHome';
 import StudentList from './components/Navigation/StudentList';
 import Attendance from './components/Navigation/Attendance';
-import EditClassDetails from './components/Navigation/EditClassDetails';
+import Settings from './components/Navigation/Settings';
+import Library from "./components/Navigation/Library";
 
 
 const App = () => {
@@ -20,7 +21,8 @@ const App = () => {
           <Route path="/dashboard/:classId/*" element={<Dashboard />} />
           <Route path="/dashboard/:classId/students" element={<StudentList />} />
           <Route path="/dashboard/:classId/attendance" element={<Attendance />} />
-          <Route path="/dashboard/:classId/edit-class" element={<EditClassDetails />} />
+          <Route path="/dashboard/:classId/settings" element={<Settings />} />
+          <Route path="/dashboard/:classId/library" element={<Library />} />
         </Routes>
       </div>
     </BrowserRouter>

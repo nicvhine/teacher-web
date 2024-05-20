@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
 const jwt = require('jsonwebtoken');
-const authenticateToken = require('../Repository/Auth-Repo');
-const { auth } = require('firebase-admin');
+const {authenticateToken} = require('../Repository/Auth-Repo');
 // USER
 router.get('/users', (req, res) => {
     taskRepo.getUsers((err, users) => {
@@ -59,6 +58,7 @@ router.post('/login', (req, res) => {
 
 
 // CLASS
+
 router.post('/class', (req, res) => {
     const { name, description, startYear, endYear } = req.body;
     if (!name || !description || !startYear || !endYear) {
@@ -74,8 +74,7 @@ router.post('/class', (req, res) => {
         }
     });
 });
-
-router.get('/class/:id',authenticateToken, (req, res) => {
+router.get('/class/:id', (req, res) => {
     const { id } = req.params;
     taskRepo.getClassById(id, (err, classDetails) => {
         if (err) {
@@ -87,7 +86,7 @@ router.get('/class/:id',authenticateToken, (req, res) => {
     });
 });
 
-router.get('/class',authenticateToken,(req, res) => {
+router.get('/class',(req, res) => {
     taskRepo.getClasses((err, classes) => {
         if (err) {
             console.error('Failed to fetch classes:', err);
@@ -100,7 +99,7 @@ router.get('/class',authenticateToken,(req, res) => {
 
 
 // Update class details
-router.put('/class/:id', authenticateToken, (req, res) => {
+router.put('/class/:id', (req, res) => {
     const { id } = req.params;
     const { name, description, startYear, endYear } = req.body;
     if (!name || !description || !startYear || !endYear) {
@@ -134,7 +133,7 @@ router.put('/class/:id', authenticateToken, (req, res) => {
 
 
 // STUDENT
-router.post('/class/:classId/students',authenticateToken, (req, res) => {
+router.post('/class/:classId/students', (req, res) => {
     const { classId } = req.params;
     const { name, email } = req.body;
     if (!name || !email) {
@@ -151,7 +150,7 @@ router.post('/class/:classId/students',authenticateToken, (req, res) => {
     });
 });
 
-router.get('/class/:classId/students', authenticateToken, (req, res) => {
+router.get('/class/:classId/students',(req, res) => {
     const { classId } = req.params;
     taskRepo.getStudentsForClass(classId, (err, students) => {
         if (err) {
@@ -165,7 +164,7 @@ router.get('/class/:classId/students', authenticateToken, (req, res) => {
 
 // Update student status
 
-router.put('/class/:classId/students/:studentId/status', authenticateToken, (req, res) => {
+router.put('/class/:classId/students/:studentId/status', (req, res) => {
     const { classId, studentId } = req.params; 
     const { status } = req.body;
     if (!status) {
@@ -178,6 +177,40 @@ router.put('/class/:classId/students/:studentId/status', authenticateToken, (req
             res.status(500).json({ error: 'Failed to update student status' });
         } else {
             res.status(200).json({ message: 'Student status updated successfully' });
+        }
+    });
+});
+
+//Add Folder
+router.post('/folders', (req, res) => {
+    const { name } = req.body;
+    if (!name) {
+        return res.status(400).json({ error: 'Folder name is required' });
+    }
+
+    taskRepo.addFolder(name, (err, result) => {
+        if (err) {
+            console.error('Failed to add folder:', err);
+            res.status(500).json({ error: 'Failed to add folder' });
+        } else {
+            res.status(201).json({ message: 'Folder added successfully' });
+        }
+    });
+});
+
+// Add File to Folder
+router.post('/files', (req, res) => {
+    const { name, folder_id } = req.body;
+    if (!name || !folder_id) {
+        return res.status(400).json({ error: 'Name and folder_id are required' });
+    }
+
+    taskRepo.addFile(name, folder_id, (err, result) => {
+        if (err) {
+            console.error('Failed to add file:', err);
+            res.status(500).json({ error: 'Failed to add file' });
+        } else {
+            res.status(201).json({ message: 'File added successfully' });
         }
     });
 });
