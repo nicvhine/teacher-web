@@ -7,7 +7,6 @@ const MyCalendar = () => {
 
   const onChange = (date) => {
     setDate(date);
-    // Add any additional logic for handling date changes
   };
 
   return (

@@ -63,7 +63,6 @@ const TaskManagement = ({ onTaskAdded }) => {
         status: newStatus
       });
   
-      // Update the status in the component state
       setTasks(prevTasks =>
         prevTasks.map(task =>
           task.id === taskId ? { ...task, status: newStatus } : task
@@ -77,21 +76,17 @@ const TaskManagement = ({ onTaskAdded }) => {
   
   const filteredTasks = tasks
     .filter(task => {
-      // Filter by title or description
       const searchMatch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          task.description.toLowerCase().includes(searchQuery.toLowerCase());
-      // Filter by status
       const statusMatch = statusFilter === 'all' || task.status === statusFilter;
       return searchMatch && statusMatch;
     })
     .sort((a, b) => {
-      // Sort by due date
       const dateA = new Date(a.due_date);
       const dateB = new Date(b.due_date);
       return dateA - dateB;
     })
     .sort((a, b) => {
-      // Move completed tasks to the end
       if (a.status === 'completed' && b.status !== 'completed') {
         return 1;
       } else if (a.status !== 'completed' && b.status === 'completed') {

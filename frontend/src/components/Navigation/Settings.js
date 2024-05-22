@@ -20,16 +20,14 @@ const Settings = () => {
         startYear,
         endYear
       });
-      console.log(response.data); // Assuming your backend returns a success message
-      // Optionally, update the UI or show a success message
+      console.log(response.data); 
+      
     } catch (error) {
       console.error("Error saving changes:", error);
-      // Handle error: Display error message or show a notification to the user
     }
   };
 
   const handleDeleteClass = async () => {
-    // Implement logic to delete a class
   };
 
   return (

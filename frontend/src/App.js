@@ -22,7 +22,6 @@ const App = () => {
           <Route path="/dashboard/:classId/*" element={<Dashboard />} />
           <Route path="/dashboard/:classId/students" element={<StudentList />} />
           <Route path="/dashboard/:classId/settings" element={<Settings />} />
-          {/* Pass handleTaskAdded function as a prop */}
           <Route path="/dashboard/:classId/tasks" element={<TaskManagement onTaskAdded={handleTaskAdded} />} />
         </Routes>
       </div>
