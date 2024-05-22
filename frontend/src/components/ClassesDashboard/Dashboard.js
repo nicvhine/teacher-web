@@ -36,7 +36,17 @@ const Dashboard = () => {
           )}
           {classId && (
             <li className="mb-3">
+              <Link className="text-white" to={`/class`}>Class List</Link>
+            </li>
+          )} 
+          {classId && (
+            <li className="mb-3">
               <Link className="text-white" to={`/dashboard/${classId}/students`}>Student List</Link>
+            </li>
+          )} 
+          {classId && (
+            <li className="mb-3">
+              <Link className="text-white" to={`/dashboard/${classId}/tasks`}>Task Management</Link>
             </li>
           )} 
           {classId && (

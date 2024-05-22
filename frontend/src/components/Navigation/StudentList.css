@@ -1,0 +1,87 @@
+.side-navbar {
+    width: 250px;
+    background-color: #333;
+    padding: 20px;
+    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+  
+  .side-navbar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .side-navbar ul li {
+    margin-bottom: 10px;
+  }
+  
+  .side-navbar ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+  }
+  
+  .studentList-content {
+    margin-left: 280px; 
+    padding: 20px;
+  }
+  
+  .studentList-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .studentList-content form {
+    margin-bottom: 20px;
+  }
+  
+  .studentList-content input[type="text"],
+  .studentList-content input[type="email"],
+  .studentList-content button {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .studentList-content input[type="text"],
+  .studentList-content input[type="email"] {
+    width: 200px;
+  }
+  
+  .studentList-content button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .studentList-content button:hover {
+    background-color: #0056b3;
+  }
+  
+  .studentList-content table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .studentList-content th,
+  .studentList-content td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .studentList-content th {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .studentList-content tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { SERVER_URL } from "../../Url";
-import './Navigation.css'; 
+import './StudentList.css'; 
 import Sidebar from "../ClassesDashboard/Dashboard";
 
 const StudentList = ({ onStudentAdded }) => {

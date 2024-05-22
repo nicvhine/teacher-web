@@ -24,63 +24,64 @@
     font-size: 18px;
   }
   
-  .studentList-content {
+  .task-management-content {
     margin-left: 280px; 
     padding: 20px;
   }
   
-  .studentList-content h2 {
+  .task-management-content h2 {
     margin-bottom: 20px;
     color: #333;
   }
   
-  .studentList-content form {
+  .task-management-content form {
     margin-bottom: 20px;
   }
   
-  .studentList-content input[type="text"],
-  .studentList-content input[type="email"],
-  .studentList-content button {
+  .task-management-content input[type="text"],
+  .task-management-content input[type="email"],
+  .task-management-content button {
     padding: 10px;
     margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
   }
   
-  .studentList-content input[type="text"],
-  .studentList-content input[type="email"] {
+  .task-management-content input[type="text"],
+  .task-management-content input[type="email"] {
     width: 200px;
   }
   
-  .studentList-content button {
+  .task-management-content button {
     background-color: #007bff;
     color: white;
     border: none;
     cursor: pointer;
   }
   
-  .studentList-content button:hover {
+  .task-management-content button:hover {
     background-color: #0056b3;
   }
   
-  .studentList-content table {
+  .task-management-content table {
     width: 100%;
     border-collapse: collapse;
   }
   
-  .studentList-content th,
-  .studentList-content td {
+  .task-management-content th,
+  .task-management-content td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: left;
   }
   
-  .studentList-content th {
+  .task-management-content th {
     background-color: #f0f0f0;
     color: #333;
   }
   
-  .studentList-content tr:nth-child(even) {
+  .task-management-content tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+  
   

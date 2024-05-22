@@ -1,5 +1,7 @@
 const pool = require('../Database');
-// USER
+const jwt = require('jsonwebtoken');
+
+//USER
 const addUser = (email, username, password, callback) => {
     const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';
     pool.query(sql, [email, username, password], (err, result) => {
@@ -11,7 +13,6 @@ const addUser = (email, username, password, callback) => {
         }
     });
 };
-
 
 const getUsers = (callback) => {
     const sql = 'SELECT * FROM users';
@@ -39,7 +40,7 @@ const getUserByEmail = (email, callback) => {
     });
 };
 
-// CLASS
+//CLASS
 const addClass = (name, description, startYear, endYear, callback) => {
     const sql = 'INSERT INTO classes (name, description, startYear, endYear) VALUES (?, ?, ?, ?)';
     pool.query(sql, [name, description, startYear, endYear], (err, result) => {
@@ -88,7 +89,8 @@ const updateClass = (id, name, description, startYear, endYear, callback) => {
     });
 };
 
-// Student List
+
+//STUDENT
 const addStudent = (name, email, classId, callback) => {
     const sql = 'INSERT INTO students (name, email, classId) VALUES (?, ?, ?)';
     pool.query(sql, [name, email, classId], (err, result) => {
@@ -113,7 +115,6 @@ const getStudentsForClass = (classId, callback) => {
     });
 };
 
-//UPDATE STUDENT STATUS
 const updateStudentStatus = (studentId, status, callback) => {
     const sql = 'UPDATE students SET status = ? WHERE id = ?';
     pool.query(sql, [status, studentId], (err, result) => {
@@ -126,25 +127,48 @@ const updateStudentStatus = (studentId, status, callback) => {
     });
 };
 
-// Add Folder
-const addFolder = (name, callback) => {
-    const sql = 'INSERT INTO Folders (name) VALUES (?)';
-    pool.query(sql, [name], (err, result) => {
+const getStudentCountForClass = (classId, callback) => {
+    const sql = 'SELECT COUNT(*) AS studentCount FROM students WHERE classId = ?';
+    pool.query(sql, [classId], (err, results) => {
         if (err) {
-            console.error('Error adding folder:', err);
+            console.error('Error fetching student count:', err);
             callback(err);
         } else {
-            callback(null, result);
+            callback(null, results[0].studentCount);
         }
     });
 };
 
-// Add File
-const addFile = (name, folder_id, callback) => {
-    const sql = 'INSERT INTO Files (name, folder_id) VALUES (?, ?)';
-    pool.query(sql, [name, folder_id], (err, result) => {
+//TASKS
+const addTasks = (title, description, due_date, classId, callback) => {
+    const sql = 'INSERT INTO tasks (title, description, due_date, classId) VALUES (?, ?, ?, ?)';
+    pool.query(sql, [title, description, due_date, classId], (err, result) => {
         if (err) {
-            console.error('Error adding file:', err);
+            console.error('Error adding task:', err);
+            return callback(err); 
+        }
+        callback(null, result);
+    });
+};
+
+
+const getTasks = (classId, callback) => {
+    const sql = 'SELECT * FROM tasks WHERE classId = ?';
+    pool.query(sql, [classId], (err, results) => {
+        if (err) {
+            console.error('Error fetching tasks:', err);
+            callback(err);
+        } else {
+            callback(null, results);
+        }
+    });
+};
+
+const updateTaskStatus = (id, status, callback) => {
+    const sql = 'UPDATE tasks SET status = ? WHERE id = ?';
+    pool.query(sql, [status, id], (err, result) => {
+        if (err) {
+            console.error('Error updating task status:', err);
             callback(err);
         } else {
             callback(null, result);
@@ -163,6 +187,8 @@ module.exports = {
     getStudentsForClass,
     updateClass,
     updateStudentStatus,
-    addFile,
-    addFolder
+    getStudentCountForClass,
+    addTasks,
+    getTasks,
+    updateTaskStatus
 };

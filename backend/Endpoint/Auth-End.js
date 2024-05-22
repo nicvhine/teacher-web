@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
+const jwt =require('jsonwebtoken');
 
-// USER
+//USERS
 router.get('/users', (req, res) => {
     taskRepo.getUsers((err, users) => {
         if (err) {
@@ -30,7 +31,6 @@ router.post('/users', (req, res) => {
     });
 });
 
-
 router.post('/login',(req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -54,8 +54,8 @@ router.post('/login',(req, res) => {
 });
 
 
-// CLASS
 
+//CLASS
 router.post('/class', (req, res) => {
     const { name, description, startYear, endYear } = req.body;
     if (!name || !description || !startYear || !endYear) {
@@ -71,6 +71,7 @@ router.post('/class', (req, res) => {
         }
     });
 });
+
 router.get('/class/:id', (req, res) => {
     const { id } = req.params;
     taskRepo.getClassById(id, (err, classDetails) => {
@@ -83,7 +84,7 @@ router.get('/class/:id', (req, res) => {
     });
 });
 
-router.get('/class',(req, res) => {
+router.get('/class', (req, res) => {
     taskRepo.getClasses((err, classes) => {
         if (err) {
             console.error('Failed to fetch classes:', err);
@@ -94,8 +95,6 @@ router.get('/class',(req, res) => {
     });
 });
 
-
-// Update class details
 router.put('/class/:id', (req, res) => {
     const { id } = req.params;
     const { name, description, startYear, endYear } = req.body;
@@ -111,7 +110,6 @@ router.put('/class/:id', (req, res) => {
         if (!classDetails) {
             return res.status(404).json({ error: 'Class not found' });
         }
-        
 
         taskRepo.updateClass(id, name, description, startYear, endYear, (err, result) => {
             if (err) {
@@ -124,8 +122,8 @@ router.put('/class/:id', (req, res) => {
     });
 });
 
+//STUDENTS
 
-// STUDENT
 router.post('/class/:classId/students', (req, res) => {
     const { classId } = req.params;
     const { name, email } = req.body;
@@ -143,7 +141,20 @@ router.post('/class/:classId/students', (req, res) => {
     });
 });
 
-router.get('/class/:classId/students',(req, res) => {
+router.get('/class/:id/studentCount', (req, res) => {
+    const { id } = req.params;
+    taskRepo.getStudentCountForClass(id, (err, count) => {
+        if (err) {
+            console.error('Failed to fetch student count:', err);
+            res.status(500).json({ error: 'Failed to fetch student count' });
+        } else {
+            res.json({ studentCount: count });
+        }
+    });
+});
+
+
+router.get('/class/:classId/students', (req, res) => {
     const { classId } = req.params;
     taskRepo.getStudentsForClass(classId, (err, students) => {
         if (err) {
@@ -155,10 +166,8 @@ router.get('/class/:classId/students',(req, res) => {
     });
 });
 
-// Update student status
-
 router.put('/class/:classId/students/:studentId/status', (req, res) => {
-    const { classId, studentId } = req.params; 
+    const { classId, studentId } = req.params;
     const { status } = req.body;
     if (!status) {
         return res.status(400).json({ error: 'Status is required' });
@@ -174,36 +183,50 @@ router.put('/class/:classId/students/:studentId/status', (req, res) => {
     });
 });
 
-//Add Folder
-router.post('/folders', (req, res) => {
-    const { name } = req.body;
-    if (!name) {
-        return res.status(400).json({ error: 'Folder name is required' });
+// TASK
+router.post('/class/:classId/tasks', (req, res) => {
+    const { classId } = req.params;
+    const { title, description, due_date } = req.body;
+    if (!title || !description || !due_date) {
+        return res.status(400).json({ error: 'Fields are required' });
     }
 
-    taskRepo.addFolder(name, (err, result) => {
+    taskRepo.addTasks(title, description, due_date, classId, (err, result) => {
         if (err) {
-            console.error('Failed to add folder:', err);
-            res.status(500).json({ error: 'Failed to add folder' });
+            console.error('Failed to add task:', err);
+            res.status(500).json({ error: 'Failed to add task' });
         } else {
-            res.status(201).json({ message: 'Folder added successfully' });
+            res.status(201).json({ message: 'Task added successfully' });
         }
     });
 });
 
-// Add File to Folder
-router.post('/files',(req, res) => {
-    const { name, folder_id } = req.body;
-    if (!name || !folder_id) {
-        return res.status(400).json({ error: 'Name and folder_id are required' });
+
+router.get('/class/:classId/tasks', (req, res) => {
+    const { classId } = req.params;
+    taskRepo.getTasks(classId, (err, students) => {
+        if (err) {
+            console.error('Failed to fetch students:', err);
+            res.status(500).json({ error: 'Failed to fetch students' });
+        } else {
+            res.json(students);
+        }
+    });
+});
+
+router.put('/class/:classId/tasks/:id/status', (req, res) => {
+    const { classId, id } = req.params;
+    const { status } = req.body;
+    if (!status) {
+        return res.status(400).json({ error: 'Status is required' });
     }
 
-    taskRepo.addFile(name, folder_id, (err, result) => {
+    taskRepo.updateStudentStatus(id, status, (err, result) => {
         if (err) {
-            console.error('Failed to add file:', err);
-            res.status(500).json({ error: 'Failed to add file' });
+            console.error('Failed to update student status:', err);
+            res.status(500).json({ error: 'Failed to update student status' });
         } else {
-            res.status(201).json({ message: 'File added successfully' });
+            res.status(200).json({ message: 'Student status updated successfully' });
         }
     });
 });

@@ -5,12 +5,13 @@ import RegisterForm from './components/Auth/RegisterForm';
 import Class from './components/Landing/AddClassForm';
 import Dashboard from './components/Navigation/DashboardHome';
 import StudentList from './components/Navigation/StudentList';
-import Attendance from './components/Navigation/Attendance';
 import Settings from './components/Navigation/Settings';
-import Library from "./components/Navigation/Library";
-
+import TaskManagement from "./components/Navigation/Tasks";
 
 const App = () => {
+  const handleTaskAdded = () => {
+  };
+
   return (
     <BrowserRouter>
       <div>
@@ -20,9 +21,9 @@ const App = () => {
           <Route path="/class" element={<Class />} />
           <Route path="/dashboard/:classId/*" element={<Dashboard />} />
           <Route path="/dashboard/:classId/students" element={<StudentList />} />
-          <Route path="/dashboard/:classId/attendance" element={<Attendance />} />
           <Route path="/dashboard/:classId/settings" element={<Settings />} />
-          <Route path="/dashboard/:classId/library" element={<Library />} />
+          {/* Pass handleTaskAdded function as a prop */}
+          <Route path="/dashboard/:classId/tasks" element={<TaskManagement onTaskAdded={handleTaskAdded} />} />
         </Routes>
       </div>
     </BrowserRouter>

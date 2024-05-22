@@ -26,26 +26,28 @@ const Class = ({ onClassAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (!name.trim() || !description.trim() || !startYear || !endYear) {
         setErrorMessage('Name, description, start year, and end year are required.');
         return;
       }
-
+  
       await axios.post(`${SERVER_URL}/api/class`, { name, description, startYear, endYear });
       console.log('Class added successfully');
-      onClassAdded();
+      onClassAdded(); // Assuming this function is used to trigger any necessary updates after a class is added
       setName('');
       setDescription('');
       setStartYear('');
       setEndYear('');
       setErrorMessage('');
-      fetchClasses(); 
+      fetchClasses(); // Fetch the updated list of classes after adding a new class
+      setShowPopup(true); // Optionally show a popup to indicate successful addition
     } catch (error) {
       console.error('Error adding class:', error);
     }
   };
+  
 
   const handleClassItemClick = (classId) => {
     window.location.href = `/dashboard/${classId}`;
@@ -213,6 +215,7 @@ const Class = ({ onClassAdded }) => {
                 }
               >
                 <div>{classItem.name}</div>
+                <div>{classItem.description}</div>
                 <div>{classItem.startYear} - {classItem.endYear}</div>
               </div>
             </li>
