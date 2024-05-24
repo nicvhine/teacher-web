@@ -2,9 +2,29 @@ const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
 const jwt =require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const {authenticateToken} = require("./Auth-Middleware");
-router.use(authenticateToken);
+const bcrypt = require('bcryptjs');
+const JWT_SECRET = process.env.JWT_SECRET || 'd0b5feeacfec370cef52f5a87597ed14f463537703a61011585d7d18cc59d21f';
+
+// Authentication Middleware
+const authenticateToken = (req, res, next) => {
+    console.log('authenticateToken')
+    console.log(req.headers)
+    const authHeader = req.headers['authorization'];
+    console.log(authHeader)
+    const token = authHeader && authHeader.split(' ')[1];
+    console.log(token)
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+router.get('/protected', authenticateToken, (req, res) => {
+    res.json({ message: 'Protected route accessed successfully' });
+});
 
 //USERS
 router.get('/users', (req, res) => {
@@ -18,45 +38,27 @@ router.get('/users', (req, res) => {
     });
 });
 
-//REGISTER
 router.post('/users', (req, res) => {
     const { email, username, password } = req.body;
+    console.log('register')
     if (!email || !username || !password) {
         return res.status(400).json({ error: 'Email, username, and password are required' });
     }
 
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
+    taskRepo.addUser(email, username, password, (err, result) => {
         if (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ error: 'Error creating user' });
+            console.error('Failed to add user:', err);
+            res.status(500).json({ error: 'Failed to add user' });
+        } else {
+            res.status(201).json({ message: 'User added successfully' });
         }
-        
-        taskRepo.addUser(email, username, hashedPassword, (err, user) => {
-            if (err) {
-                console.error('Failed to add user:', err);
-                return res.status(500).json({ error: 'Failed to add user' });
-            }
-
-            const accessToken = jwt.sign({ email: user.email, id: user.id }, process.env.d0b5feeacfec370cef52f5a87597ed14f463537703a61011585d7d18cc59d21f, { expiresIn: '15m' });
-            const refreshToken = jwt.sign({ email: user.email, id: user.id }, process.env.d0b5feeacfec370cef52f5a87597ed14f463537703a61011585d7d18cc59d21f);
-
-            taskRepo.storeTokens(user.id, accessToken, refreshToken, (err, result) => {
-                if (err) {
-                    console.error('Error storing tokens:', err);
-                    return res.status(500).json({ error: 'Error storing tokens' });
-                }
-
-                res.status(201).json({ accessToken, refreshToken, message: 'User registered successfully' });
-            });
-        });
     });
 });
 
-
-
-//LOGIN
+//LOGIN 
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
+
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
     }
@@ -66,26 +68,21 @@ router.post('/login', (req, res) => {
             console.error('Error during login:', err);
             return res.status(500).json({ error: 'An error occurred during login' });
         }
+
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         try {
-            const isPasswordValid = await bcrypt.compare(password, user.password);
+            const isPasswordValid = password === user.password;
+
             if (!isPasswordValid) {
                 return res.status(401).json({ error: 'Invalid password' });
             }
 
-            const accessToken = jwt.sign({ email: user.email, id: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' });
-            const refreshToken = jwt.sign({ email: user.email, id: user.id }, process.env.JWT_SECRET);
-
-            taskRepo.storeTokens(user.id, accessToken, refreshToken, (err, result) => {
-                if (err) {
-                    console.error('Error storing tokens:', err);
-                    return res.status(500).json({ error: 'Error storing tokens' });
-                }
-                res.status(200).json({ accessToken, refreshToken, message: 'Login successful' });
-            });
+            const accessToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET, { expiresIn: '15m' });
+            const refreshToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET);
+            res.status(200).json({ accessToken, refreshToken, message: 'Login successful' });
         } catch (error) {
             console.error('Error comparing passwords:', error);
             res.status(500).json({ error: 'An error occurred during login' });
@@ -93,22 +90,35 @@ router.post('/login', (req, res) => {
     });
 });
 
-//LOGOUT
-
-router.post('/logout', (req, res) => {
-    const { accessToken, refreshToken } = req.body;
-    if (!accessToken || !refreshToken) {
-        return res.status(400).json({ error: 'Access token and refresh token are required' });
+// Refresh Token 
+router.post('/refresh-token', (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(400).json({ error: 'Refresh token is required' });
     }
 
-    taskRepo.deleteTokens(accessToken, refreshToken, (err, result) => {
+    jwt.verify(refreshToken, JWT_SECRET, (err, user) => {
         if (err) {
-            console.error('Error deleting tokens:', err);
-            return res.status(500).json({ error: 'Error deleting tokens' });
+            return res.status(403).json({ error: 'Invalid refresh token' });
         }
-        res.status(200).json({ message: 'Logout successful' });
+
+        const accessToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET, { expiresIn: '15m' });
+        res.json({ accessToken, message: 'Access token refreshed successfully' });
     });
 });
+
+// Logout Endpoint
+router.post('/logout', (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(400).json({ error: 'Refresh token is required' });
+    }
+
+    removeFromValidRefreshTokens(refreshToken);
+
+    res.json({ message: 'Logged out successfully' });
+});
+
 
 
 //CLASS
@@ -277,7 +287,7 @@ router.put('/class/:classId/tasks/:id/status', (req, res) => {
         return res.status(400).json({ error: 'Status is required' });
     }
 
-    taskRepo.updateStudentStatus(id, status, (err, result) => {
+    taskRepo.updateTaskStatus(id, status, (err, result) => {
         if (err) {
             console.error('Failed to update student status:', err);
             res.status(500).json({ error: 'Failed to update student status' });

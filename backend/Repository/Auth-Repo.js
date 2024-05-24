@@ -1,11 +1,7 @@
 const pool = require('../Database');
 const jwt = require('jsonwebtoken');
 
-const generateTokens = (userId) => {
-    const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET);
-    return { accessToken, refreshToken };
-};
+
 //USER
 const addUser = (email, username, password, callback) => {
     const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';
@@ -31,32 +27,6 @@ const getUsers = (callback) => {
     });
 };
 
-const login = (email, password, callback) => {
-    getUserByEmail(email, async (err, user) => {
-        if (err) {
-            console.error('Error during login:', err);
-            return callback(err);
-        }
-        if (!user) {
-            return callback(null, null);
-        }
-
-        try {
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            if (!isPasswordValid) {
-                return callback(null, null);
-            }
-
-            // Generate tokens
-            const tokens = generateTokens(user.id);
-            callback(null, tokens);
-        } catch (error) {
-            console.error('Error comparing passwords:', error);
-            callback(error);
-        }
-    });
-};
-
 const getUserByEmail = (email, callback) => {
     const sql = 'SELECT * FROM users WHERE email = ?';
     pool.query(sql, [email], (err, results) => {
@@ -65,9 +35,9 @@ const getUserByEmail = (email, callback) => {
             return callback(err);
         }
         if (results.length === 0) {
-            return callback(null, null);
+            return callback(null, null); 
         }
-        callback(null, results[0]);
+        callback(null, results[0]); 
     });
 };
 
@@ -221,7 +191,5 @@ module.exports = {
     getStudentCountForClass,
     addTasks,
     getTasks,
-    updateTaskStatus,
-    generateTokens,
-    login
+    updateTaskStatus
 };
