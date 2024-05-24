@@ -2,6 +2,25 @@ const express = require('express');
 const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
 const jwt =require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const JWT_SECRET = process.env.JWT_SECRET || 'd0b5feeacfec370cef52f5a87597ed14f463537703a61011585d7d18cc59d21f';
+
+// Authentication Middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['Authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+router.get('/protected', authenticateToken, (req, res) => {
+    res.json({ message: 'Protected route accessed successfully' });
+});
 
 //USERS
 router.get('/users', (req, res) => {
@@ -31,25 +50,39 @@ router.post('/users', (req, res) => {
     });
 });
 
-router.post('/login',(req, res) => {
+//LOGIN 
+router.post('/login', (req, res) => {
     const { email, password } = req.body;
+
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    taskRepo.getUserByEmail(email, (err, user) => {
+    taskRepo.getUserByEmail(email, async (err, user) => {
         if (err) {
             console.error('Error during login:', err);
             return res.status(500).json({ error: 'An error occurred during login' });
         }
+
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        if (user.password !== password) {
-            return res.status(401).json({ error: 'Invalid password' });
+
+        try {
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: 'Invalid password' });
+            }
+
+            const accessToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET, { expiresIn: '15m' });
+            const refreshToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET);
+
+            res.status(200).json({ accessToken, refreshToken, message: 'Login successful' });
+        } catch (error) {
+            console.error('Error comparing passwords:', error);
+            res.status(500).json({ error: 'An error occurred during login' });
         }
-        
-        res.status(200).json({ message: 'Login successful' });
     });
 });
 
@@ -221,7 +254,7 @@ router.put('/class/:classId/tasks/:id/status', (req, res) => {
         return res.status(400).json({ error: 'Status is required' });
     }
 
-    taskRepo.updateStudentStatus(id, status, (err, result) => {
+    taskRepo.updateTaskStatus(id, status, (err, result) => {
         if (err) {
             console.error('Failed to update student status:', err);
             res.status(500).json({ error: 'Failed to update student status' });
@@ -232,3 +265,4 @@ router.put('/class/:classId/tasks/:id/status', (req, res) => {
 });
 
 module.exports = router;
+module.exports = authenticateToken;

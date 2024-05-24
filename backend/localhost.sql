@@ -48,12 +48,6 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`) VALUES
-(10, 'nic', 'nic@gmsail', 'nic'),
-(11, 'alb', 'alb@gmail', 'alb'),
-(12, 'ras', 'ras@gmail', 'ras'),
-(13, 'sae', 'sar@gmail', 'sae');
-
 ALTER TABLE `classes`
   ADD PRIMARY KEY (`id`);
 

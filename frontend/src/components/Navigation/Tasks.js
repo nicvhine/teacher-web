@@ -74,6 +74,7 @@ const TaskManagement = ({ onTaskAdded }) => {
   };
   
   
+  
   const filteredTasks = tasks
     .filter(task => {
       const searchMatch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -123,7 +124,7 @@ const TaskManagement = ({ onTaskAdded }) => {
           />
           </div>
           <input
-            style={{width: "11%", marginBottom: "10px"}}
+            style={{width: "12%", marginBottom: "10px", padding: "8px"}}
             type="date"
             name="due_date"
             placeholder="Due Date"

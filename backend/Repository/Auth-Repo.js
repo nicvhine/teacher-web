@@ -1,6 +1,7 @@
 const pool = require('../Database');
 const jwt = require('jsonwebtoken');
 
+
 //USER
 const addUser = (email, username, password, callback) => {
     const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';

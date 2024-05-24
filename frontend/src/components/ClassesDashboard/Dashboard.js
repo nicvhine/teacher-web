@@ -8,11 +8,20 @@ import { Card } from "react-bootstrap";
 const Dashboard = () => {
   const { classId } = useParams();
   const [classInfo, setClassInfo] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     if (classId) {
       fetchClassInfo(classId);
     }
+
+    // Update current time every second
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(intervalId);
   }, [classId]);
 
   const fetchClassInfo = async (id) => {
@@ -64,6 +73,9 @@ const Dashboard = () => {
           </li>
         </ul>
       </nav>
+      <div className="clock-container">
+        <p className="clock">{currentTime.toLocaleTimeString()}</p>
+      </div>
     </div>
   );
 };
