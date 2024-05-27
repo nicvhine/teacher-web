@@ -269,6 +269,18 @@ router.get('/class/:id/studentCount', (req, res) => {
     });
 });
 
+router.get('/class/:id/taskCount', (req, res) => {
+    const { id } = req.params;
+    taskRepo.getTaskCountForClass(id, (err, count) => {
+        if (err) {
+            console.error('Failed to fetch task count:', err);
+            res.status(500).json({ error: 'Failed to fetch task count' });
+        } else {
+            res.json({ taskCount: count });
+        }
+    });
+});
+
 
 router.get('/class/:classId/students', (req, res) => {
     const { classId } = req.params;

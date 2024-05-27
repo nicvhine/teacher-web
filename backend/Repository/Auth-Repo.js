@@ -204,6 +204,18 @@ const getStudentCountForClass = (classId, callback) => {
     });
 };
 
+const getTaskCountForClass = (classId, callback) => {
+    const sql = 'SELECT COUNT(*) AS taskCount FROM tasks WHERE classId = ?';
+    pool.query(sql, [classId], (err, results) => {
+        if (err) {
+            console.error('Error fetching task count:', err);
+            callback(err);
+        } else {
+            callback(null, results[0].taskCount);
+        }
+    });
+};
+
 const addTasks = (title, description, due_date, classId, callback) => {
     const checkDuplicateSql = 'SELECT * FROM tasks WHERE title = ? AND description = ?';
 
@@ -273,5 +285,6 @@ module.exports = {
     getStudentCountForClass,
     addTasks,
     getTasks,
-    updateTaskStatus
+    updateTaskStatus,
+    getTaskCountForClass
 };
