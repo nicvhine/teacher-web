@@ -84,4 +84,17 @@
     background-color: #f2f2f2;
   }
   
+  .error-message-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-left: -70%;
+
+  }
   
+  .success-message-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-left: -82%;
+  }

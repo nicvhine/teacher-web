@@ -11,28 +11,30 @@ const TaskManagement = ({ onTaskAdded }) => {
   const [description, setDescription] = useState('');
   const [due_date, setDueDate] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(`${SERVER_URL}/api/class/${classId}/tasks`);
-        setTasks(response.data); 
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/api/class/${classId}/tasks`);
+      setTasks(response.data); 
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
 
-    fetchTasks();
-  }, [classId]);
+  useEffect(() => {
+  fetchTasks();
+}, [classId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      if (!title.trim() || !description.trim() || !due_date) {
+      if (!title.trim() || !description.trim() || !due_date.trim) {
         setErrorMessage('Fields cannot be empty.');
         return;
       }
@@ -49,11 +51,18 @@ const TaskManagement = ({ onTaskAdded }) => {
       setDescription("");
       setDueDate("");
       setErrorMessage("");
-      setShowPopup(true);
+      setSuccessMessage("Task added successfully");
+      fetchTasks();
+
     } catch (error) {
-      console.error("Error adding task:", error);
+        console.error("Error adding task", error);
+        if (error.response && error.response.status === 409) {
+            setErrorMessage("Information provided already exists");
+        } else {
+            setErrorMessage("Error adding student. Please try again later.");
+        }
     }
-  };
+};
 
   const toggleStatus = async (taskId, currentStatus) => {
     try {
@@ -104,6 +113,12 @@ const TaskManagement = ({ onTaskAdded }) => {
       </nav>
       <div className="task-management-content">
         <h2>Add New Task</h2>
+        <div className="error-message-container">
+      {errorMessage && <div className="text-danger">{errorMessage}</div>}
+      </div>
+      <div className="success-message-container">
+      {successMessage && <div className="text-success">{successMessage}</div>}
+      </div>
         <form onSubmit={handleSubmit} className="task-form">
           <input
             style={{width: "30%", marginBottom: "10px"}}
@@ -157,7 +172,6 @@ const TaskManagement = ({ onTaskAdded }) => {
             </select>
           </div>
         </div>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
         <table>
           <thead>
             <tr>

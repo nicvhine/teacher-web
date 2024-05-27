@@ -5,17 +5,17 @@ import { SERVER_URL } from "../../Url";
 import './StudentList.css'; 
 import Sidebar from "../ClassesDashboard/Dashboard";
 
-const StudentList = ({ onStudentAdded }) => {
+const StudentList = ({ onStudentAdded = () => {} }) => {
   const { classId } = useParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [students, setStudents] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
     const fetchStudents = async () => {
       try {
         const response = await axios.get(`${SERVER_URL}/api/class/${classId}/students`);
@@ -25,11 +25,12 @@ const StudentList = ({ onStudentAdded }) => {
       }
     };
 
+    useEffect(() => {
     fetchStudents();
   }, [classId]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault(); 
     
     try {
       if (!name.trim() || !email.trim()) {
@@ -43,16 +44,22 @@ const StudentList = ({ onStudentAdded }) => {
       });
 
       console.log("Student added successfully");
-      onStudentAdded(); // Invoke onStudentAdded function after successful addition
+      onStudentAdded(); 
       setName("");
       setEmail("");
-      setErrorMessage(""); // Clear error message on success
-      setShowPopup(true);
+      setErrorMessage(""); 
+      setSuccessMessage("Student added successfully");
+      fetchStudents();
+
     } catch (error) {
-      console.error("Error adding student:", error);
-      setErrorMessage('Error adding student. Please try again.'); // Set error message on failure
+        console.error("Error adding student", error);
+        if (error.response && error.response.status === 409) {
+            setErrorMessage("A student with the same email already exists.");
+        } else {
+            setErrorMessage("Error adding student. Please try again later.");
+        }
     }
-  };
+};
 
   const toggleStatus = (studentId, currentStatus) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -91,6 +98,12 @@ const StudentList = ({ onStudentAdded }) => {
       </nav>
       <div className="studentList-content">
         <h2>Add New Student</h2>
+        <div className="error-message-container">
+      {errorMessage && <div className="text-danger">{errorMessage}</div>}
+      </div>
+      <div className="success-message-container">
+      {successMessage && <div className="text-success">{successMessage}</div>}
+      </div>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -128,7 +141,7 @@ const StudentList = ({ onStudentAdded }) => {
           </select>
           </div>
         </div>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
+      
         <table>
           <thead>
             <tr>

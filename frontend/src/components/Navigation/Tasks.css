@@ -30,7 +30,7 @@
   }
   
   .task-management-content h2 {
-    margin-bottom: 20px;
+    margin-bottom: 50px;
     color: #333;
   }
   
@@ -83,5 +83,17 @@
   .task-management-content tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+
+  .error-message-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+  }
   
+  .success-message-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
   

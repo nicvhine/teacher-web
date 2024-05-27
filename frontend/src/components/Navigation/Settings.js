@@ -14,6 +14,7 @@ const Settings = ({ onTaskAdded }) => {
   const [startYear, setStartYear] = useState("");
   const [endYear, setEndYear] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [tasks, setTasks] = useState([]);
 
@@ -70,7 +71,7 @@ const Settings = ({ onTaskAdded }) => {
 
       console.log("Class details updated successfully");
       setErrorMessage("");
-      setShowPopup(true);
+      setSuccessMessage("Class updated successfully");
     } catch (error) {
       console.error("Error updating class details:", error);
     }
@@ -92,6 +93,12 @@ const Settings = ({ onTaskAdded }) => {
       </nav>
       <div className="task-management-content">
         <h2>Edit Class Details</h2>
+        <div className="error-message-container">
+      {errorMessage && <div className="text-danger">{errorMessage}</div>}
+      </div>
+      <div className="success-message-container">
+      {successMessage && <div className="text-success">{successMessage}</div>}
+      </div>
         <form onSubmit={handleSubmit} className="task-form">
           <p>Class Name</p>
           <input

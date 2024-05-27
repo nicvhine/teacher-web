@@ -4,16 +4,16 @@ import { SERVER_URL } from "../../Url";
 import { Link } from "react-router-dom";
 
 
-const Class = ({ onClassAdded }) => {
+const Class = ({ onClassAdded = () => {}}) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [group, setGroup] = useState('');
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [classes, setClasses] = useState([]);
-  
-  useEffect(() => {
+
   const fetchClasses = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/api/class`);
@@ -23,38 +23,48 @@ const Class = ({ onClassAdded }) => {
     }
   };
 
-  fetchClasses();
-}, []);
+  useEffect(() => {
+    fetchClasses();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      if (!name.trim() || !description.trim() || !group.trim() || !startYear.trim() || !endYear.trim()){
-        setErrorMessage('All fields are required');
-        return;
-      }
+    try {
+        if (!name.trim() || !description.trim() || !group.trim() || !startYear.trim() || !endYear.trim()) {
+            setErrorMessage('All fields are required');
+            return;
+        }
 
-      await axios.post(`${SERVER_URL}/api/class`, {
-        name,
-        description,
-        group,
-        startYear,
-        endYear
-      });
+        await axios.post(`${SERVER_URL}/api/class`, {
+            name,
+            description,
+            group,
+            startYear,
+            endYear
+        });
 
-      console.log("Class added successfully");
-      onClassAdded();
-      setName("");
-      setDescription("");
-      setGroup("");
-      setStartYear("");
-      setEndYear("");
-      setErrorMessage("");
-    }catch (error) {
-      console.error("Error adding class", error);
-      setErrorMessage("Error adding class");
+        console.log("Class added successfully");
+        onClassAdded();
+        setName("");
+        setDescription("");
+        setGroup("");
+        setStartYear("");
+        setEndYear("");
+        setErrorMessage("");
+        setSuccessMessage("Class added successfully");
+        fetchClasses();
+        
+    } catch (error) {
+        console.error("Error adding class", error);
+        if (error.response && error.response.status === 409) {
+            setErrorMessage("A class with the same name and group already exists.");
+        } else {
+            setErrorMessage("Error adding class. Please try again later.");
+        }
     }
-  };
+};
+
+
   
   const handleClassItemClick = (classId) => {
     window.location.href = `/dashboard/${classId}`;
@@ -165,6 +175,15 @@ const Class = ({ onClassAdded }) => {
             display: flex;
             justify-content: center;
             margin-top: 20px;
+            margin-left: 2%;
+
+          }
+          
+          .success-message-container{
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-left: 2%;
           }
         `}
       </style>
@@ -173,6 +192,9 @@ const Class = ({ onClassAdded }) => {
       </div>
       <div className="error-message-container">
       {errorMessage && <div className="text-danger">{errorMessage}</div>}
+      </div>
+      <div className="success-message-container">
+      {successMessage && <div className="text-success">{successMessage}</div>}
       </div>
       <div className="form-container">
         <form onSubmit={handleSubmit} className="login-form">

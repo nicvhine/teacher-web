@@ -13,10 +13,13 @@
 
 .name-description-container h1 {
   margin-bottom: 10px;
+  font-size: 100px;
 }
 
 .name-description-container h2 {
-  margin-bottom: 20px;
+  font-size: 50px;
+  margin-bottom: 50px;
+
 }
 
 .numberStudents {

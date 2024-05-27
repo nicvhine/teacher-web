@@ -4,14 +4,31 @@ const jwt = require('jsonwebtoken');
 
 //USER
 const addUser = (email, password, callback) => {
-    const sql = 'INSERT INTO users (email, password) VALUES (?, ?)';
-    pool.query(sql, [email, password], (err, result) => {
+    const checkDuplicateSql = 'SELECT * FROM users WHERE email = ?';
+    const sql = 'INSERT INTO users (email) VALUES (?)';
+    pool.query(checkDuplicateSql, [email], (err, rows) => {
         if (err) {
-            console.error('Error adding user:', err);
+            console.error('Error checking for duplicate users:', err);
             callback(err);
-        } else {
-            callback(null, result);
+            return;
         }
+
+        if (rows.length > 0) {
+            const duplicateError = new Error('A user with the same email already exists.');
+            duplicateError.statusCode = 409;
+            callback(duplicateError);
+            return;
+        }
+
+        const insertSql = 'INSERT INTO users (email, password) VALUES (?, ?)';
+        pool.query(insertSql, [email, password], (err, result) => {
+            if (err) {
+                console.error('Error registering user:', err);
+                callback(err);
+            } else {
+                callback(null, result);
+            }
+        });
     });
 };
 
@@ -43,16 +60,37 @@ const getUserByEmail = (email, callback) => {
 
 //CLASS
 const addClass = (name, description, group, startYear, endYear, callback) => {
-    const sql = 'INSERT INTO classes (name, description, `group`, startYear, endYear) VALUES (?, ?, ?, ?, ?)';
-    pool.query(sql, [name, description, group, startYear, endYear], (err, result) => {
+    // Check if a class with the same name and group already exists
+    const checkDuplicateSql = 'SELECT * FROM classes WHERE name = ? AND `group` = ?';
+    pool.query(checkDuplicateSql, [name, group], (err, rows) => {
         if (err) {
-            console.error('Error adding class:', err);
+            console.error('Error checking for duplicate class:', err);
             callback(err);
-        } else {
-            callback(null, result);
+            return;
         }
+
+        if (rows.length > 0) {
+            const duplicateError = new Error('A class with the same name and group already exists.');
+            // Pass status code 409 for conflict
+            duplicateError.statusCode = 409;
+            callback(duplicateError);
+            return;
+        }
+
+        // If no duplicate class found, proceed with adding the new class
+        const insertSql = 'INSERT INTO classes (name, description, `group`, startYear, endYear) VALUES (?, ?, ?, ?, ?)';
+        pool.query(insertSql, [name, description, group, startYear, endYear], (err, result) => {
+            if (err) {
+                console.error('Error adding class:', err);
+                callback(err);
+            } else {
+                callback(null, result);
+            }
+        });
     });
 };
+
+
 
 const getClassById = (id, callback) => {
     const sql = 'SELECT * FROM classes WHERE id = ?';
@@ -90,17 +128,43 @@ const updateClass = (id, name, description, startYear, endYear, callback) => {
     });
 };
 
-
-//STUDENT
-const addStudent = (name, email, classId, callback) => {
-    const sql = 'INSERT INTO students (name, email, classId) VALUES (?, ?, ?)';
-    pool.query(sql, [name, email, classId], (err, result) => {
+const deleteClass = (id, callback) => {
+    const sql = 'DELETE FROM classes WHERE id = ?';
+    pool.query(sql, [id], (err, result) => {
         if (err) {
-            console.error('Error adding student:', err);
+            console.error('Error deleting class:', err);
             callback(err);
         } else {
             callback(null, result);
         }
+    });
+};
+//STUDENT
+const addStudent = (name, email, classId, callback) => {
+    const checkDuplicateSql = 'SELECT * FROM students WHERE email = ?';
+
+    pool.query(checkDuplicateSql, [email], (err, rows) => {
+        if (err) {
+            console.error('Error checking for duplicate students:', err);
+            callback(err);
+            return;
+        }
+
+        if (rows.length > 0) {
+            const duplicateError = new Error('A student with the same email already exists.');
+            duplicateError.statusCode = 409;
+            callback(duplicateError);
+            return;
+        }
+        const insertSql = 'INSERT INTO students (name, email, classId) VALUES (?, ?, ?)';
+        pool.query(insertSql, [name, email, classId], (err, result) => {
+            if (err) {
+                console.error('Error adding student:', err);
+                callback(err);
+            } else {
+                callback(null, result);
+            }
+        });
     });
 };
 
@@ -140,19 +204,36 @@ const getStudentCountForClass = (classId, callback) => {
     });
 };
 
-//TASKS
 const addTasks = (title, description, due_date, classId, callback) => {
-    const sql = 'INSERT INTO tasks (title, description, due_date, classId) VALUES (?, ?, ?, ?)';
-    pool.query(sql, [title, description, due_date, classId], (err, result) => {
+    const checkDuplicateSql = 'SELECT * FROM tasks WHERE title = ? AND description = ?';
+
+    pool.query(checkDuplicateSql, [title, description], (err, rows) => {
         if (err) {
-            console.error('Error adding task:', err);
-            return callback(err); 
+            console.error('Error checking for duplicate tasks:', err);
+            callback(err);
+            return;
         }
-        callback(null, result);
+
+        if (rows.length > 0) {
+            const duplicateError = new Error('Information provided has duplicates');
+            duplicateError.statusCode = 409;
+            callback(duplicateError);
+            return;
+        }
+
+        const insertSql = 'INSERT INTO tasks (title, description, due_date, classId) VALUES (?, ?, ?, ?)';
+        pool.query(insertSql, [title, description, due_date, classId], (err, result) => {
+            if (err) {
+                console.error('Error adding task:', err);
+                callback(err);
+            } else {
+                callback(null, result);
+            }
+        });
     });
 };
 
-
+  
 const getTasks = (classId, callback) => {
     const sql = 'SELECT * FROM tasks WHERE classId = ?';
     pool.query(sql, [classId], (err, results) => {
@@ -188,6 +269,7 @@ module.exports = {
     getStudentsForClass,
     updateClass,
     updateStudentStatus,
+    deleteClass,
     getStudentCountForClass,
     addTasks,
     getTasks,

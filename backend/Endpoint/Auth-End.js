@@ -22,6 +22,19 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// Middleware to authenticate access token
+const authenticateAccessToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const accessToken = authHeader && authHeader.split(' ')[1];
+    if (!accessToken) return res.sendStatus(401);
+
+    jwt.verify(accessToken, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
 router.get('/protected', authenticateToken, (req, res) => {
     res.json({ message: 'Protected route accessed successfully' });
 });
@@ -47,9 +60,13 @@ router.post('/users', (req, res) => {
     taskRepo.addUser(email, password, (err, result) => {
         if (err) {
             console.error('Failed to add user:', err);
-            res.status(500).json({ error: 'Failed to add user' });
-        } else {
-            res.status(201).json({ message: 'User added successfully' });
+            if(err.statusCode === 409){
+                return res.status(409).json({ error: err.message });
+            }else{
+                return res.status(500).json({ error: 'Failed to add user' });
+        } 
+        }else {
+                return res.status(201).json({ message: 'User added successfully' });
         }
     });
 });
@@ -106,17 +123,18 @@ router.post('/refresh-token', (req, res) => {
     });
 });
 
-// Logout Endpoint
+//logout
 router.post('/logout', (req, res) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
         return res.status(400).json({ error: 'Refresh token is required' });
     }
 
-    removeFromValidRefreshTokens(refreshToken);
+    removeFromValidRefreshTokens(refreshToken); 
 
     res.json({ message: 'Logged out successfully' });
 });
+
 
 
 
@@ -130,12 +148,17 @@ router.post('/class', (req, res) => {
     taskRepo.addClass(name, description, group, startYear, endYear, (err, result) => {
         if (err) {
             console.error('Failed to add class:', err);
-            res.status(500).json({ error: 'Failed to add class' });
+            if (err.statusCode === 409) {
+                return res.status(409).json({ error: err.message });
+            } else {
+                return res.status(500).json({ error: 'Failed to add class' });
+            }
         } else {
-            res.status(201).json({ message: 'Class added successfully' });
+            return res.status(201).json({ message: 'Class added successfully' });
         }
     });
 });
+
 
 router.get('/class/:id', (req, res) => {
     const { id } = req.params;
@@ -187,6 +210,31 @@ router.put('/class/:id', (req, res) => {
     });
 });
 
+// Delete Class
+router.delete('/class/:classId', (req, res) => {
+    const { classId } = req.params;
+    
+    taskRepo.getClassById(classId, (err, classDetails) => {
+        if (err) {
+            console.error('Error fetching class details:', err);
+            return res.status(500).json({ error: 'Failed to fetch class details' });
+        }
+        if (!classDetails) {
+            return res.status(404).json({ error: 'Class not found' });
+        }
+
+        taskRepo.deleteClass(classId, (err, result) => {
+            if (err) {
+                console.error('Failed to delete class:', err);
+                res.status(500).json({ error: 'Failed to delete class' });
+            } else {
+                res.status(200).json({ message: 'Class deleted successfully' });
+            }
+        });
+    });
+});
+
+
 //STUDENTS
 
 router.post('/class/:classId/students', (req, res) => {
@@ -199,9 +247,12 @@ router.post('/class/:classId/students', (req, res) => {
     taskRepo.addStudent(name, email, classId, (err, result) => {
         if (err) {
             console.error('Failed to add student:', err);
-            res.status(500).json({ error: 'Failed to add student' });
+            if (err.statusCode === 409) {
+                return res.status(409).json({ error: err.message });
         } else {
-            res.status(201).json({ message: 'Student added successfully' });
+                return res.status(500).json({ error: 'Failed to add student' });
+        }}else{
+                return res.status(201).json({ message: "Student added successfully"});
         }
     });
 });
@@ -256,12 +307,15 @@ router.post('/class/:classId/tasks', (req, res) => {
         return res.status(400).json({ error: 'Fields are required' });
     }
 
-    taskRepo.addTasks(title, description, due_date, classId, (err, result) => {
+    taskRepo.addTasks(title, description, due_date, classId,(err, result) => {
         if (err) {
             console.error('Failed to add task:', err);
-            res.status(500).json({ error: 'Failed to add task' });
+            if (err.statusCode === 409) {
+                return res.status(409).json({ error: err.message });
         } else {
-            res.status(201).json({ message: 'Task added successfully' });
+                return res.status(500).json({ error: 'Failed to add task' });
+        }}else{
+                return res.status(201).json({ message: "Task added successfully"});
         }
     });
 });

@@ -52,6 +52,7 @@ const Dashboard = () => {
             ) : (
               <p>Loading...</p> // Added closing parenthesis
             )}
+
             <div className="clock-container">
               <p className="clock">{currentTime.toLocaleTimeString()}</p>
             </div>
