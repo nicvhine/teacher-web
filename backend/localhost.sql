@@ -5,7 +5,7 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) 
+); -- Added semicolon to terminate the CREATE TABLE statement
 
 -- Table structure for classes
 CREATE TABLE `classes` (
@@ -16,7 +16,7 @@ CREATE TABLE `classes` (
   `endYear` int(11) NOT NULL,
   `group` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) 
+);
 
 -- Table structure for students
 CREATE TABLE `students` (
@@ -28,7 +28,7 @@ CREATE TABLE `students` (
   PRIMARY KEY (`id`),
   KEY `del` (`classId`),
   CONSTRAINT `del` FOREIGN KEY (`classId`) REFERENCES `classes` (`id`) ON DELETE CASCADE
-) 
+);
 
 -- Table structure for tasks
 CREATE TABLE `tasks` (
@@ -41,12 +41,13 @@ CREATE TABLE `tasks` (
   PRIMARY KEY (`id`),
   KEY `tasks_ibfk_1` (`classId`),
   CONSTRAINT `tasks_ibfk_1` FOREIGN KEY (`classId`) REFERENCES `classes` (`id`) ON DELETE CASCADE
-) 
+);
+
 -- Table structure for folders
 CREATE TABLE `folders` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) 
+);
 
 -- Table structure for files
 CREATE TABLE `files` (
@@ -55,4 +56,4 @@ CREATE TABLE `files` (
   PRIMARY KEY (`id`),
   KEY `folder_id` (`folder_id`),
   CONSTRAINT `files_ibfk_1` FOREIGN KEY (`folder_id`) REFERENCES `folders` (`id`)
-) 
+);
