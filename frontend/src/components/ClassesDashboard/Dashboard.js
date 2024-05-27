@@ -15,12 +15,10 @@ const Dashboard = () => {
       fetchClassInfo(classId);
     }
 
-    // Update current time every second
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
-    // Clear interval on component unmount
     return () => clearInterval(intervalId);
   }, [classId]);
 
@@ -45,11 +43,6 @@ const Dashboard = () => {
           )}
           {classId && (
             <li className="mb-3">
-              <Link className="text-white" to={`/class`}>Class List</Link>
-            </li>
-          )} 
-          {classId && (
-            <li className="mb-3">
               <Link className="text-white" to={`/dashboard/${classId}/students`}>Student List</Link>
             </li>
           )} 
@@ -60,22 +53,20 @@ const Dashboard = () => {
           )} 
           {classId && (
             <li className="mb-3">
-              <Link className="text-white" to={`/dashboard/${classId}/library`}>Resource Library</Link>
+              <Link className="text-white" to={`/dashboard/${classId}/settings`}>Class Management</Link>
             </li>
           )}
           {classId && (
             <li className="mb-3">
-              <Link className="text-white" to={`/dashboard/${classId}/settings`}>Settings</Link>
+              <Link className="text-white" to={`/class`}>Class List</Link>
             </li>
-          )}
+          )} 
           <li className="mb-3">
             <Link className="text-white" to="/">Logout</Link>
           </li>
         </ul>
       </nav>
-      <div className="clock-container">
-        <p className="clock">{currentTime.toLocaleTimeString()}</p>
-      </div>
+
     </div>
   );
 };

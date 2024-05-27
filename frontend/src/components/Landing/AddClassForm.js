@@ -3,18 +3,17 @@ import axios from "axios";
 import { SERVER_URL } from "../../Url";
 import { Link } from "react-router-dom";
 
+
 const Class = ({ onClassAdded }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [group, setGroup] = useState('');
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [classes, setClasses] = useState([]);
-  const [showPopup, setShowPopup] = useState(false); 
+  
   useEffect(() => {
-    fetchClasses();
-  }, []);
-
   const fetchClasses = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/api/class`);
@@ -24,31 +23,39 @@ const Class = ({ onClassAdded }) => {
     }
   };
 
+  fetchClasses();
+}, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    try {
-      if (!name.trim() || !description.trim() || !startYear || !endYear) {
-        setErrorMessage('Name, description, start year, and end year are required.');
+    try{
+      if (!name.trim() || !description.trim() || !group.trim() || !startYear.trim() || !endYear.trim()){
+        setErrorMessage('All fields are required');
         return;
       }
-  
-      await axios.post(`${SERVER_URL}/api/class`, { name, description, startYear, endYear });
-      console.log('Class added successfully');
-      onClassAdded(); // Assuming this function is used to trigger any necessary updates after a class is added
-      setName('');
-      setDescription('');
-      setStartYear('');
-      setEndYear('');
-      setErrorMessage('');
-      fetchClasses(); // Fetch the updated list of classes after adding a new class
-      setShowPopup(true); // Optionally show a popup to indicate successful addition
-    } catch (error) {
-      console.error('Error adding class:', error);
+
+      await axios.post(`${SERVER_URL}/api/class`, {
+        name,
+        description,
+        group,
+        startYear,
+        endYear
+      });
+
+      console.log("Class added successfully");
+      onClassAdded();
+      setName("");
+      setDescription("");
+      setGroup("");
+      setStartYear("");
+      setEndYear("");
+      setErrorMessage("");
+    }catch (error) {
+      console.error("Error adding class", error);
+      setErrorMessage("Error adding class");
     }
   };
   
-
   const handleClassItemClick = (classId) => {
     window.location.href = `/dashboard/${classId}`;
     console.log(`Clicked on class with ID: ${classId}`);
@@ -153,10 +160,19 @@ const Class = ({ onClassAdded }) => {
           .logout-icon:hover {
             text-decoration: underline;
           }
+
+          .error-message-container{
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+          }
         `}
       </style>
       <div className="logout-container">
         <Link to="/" className="logout-icon">Logout</Link>
+      </div>
+      <div className="error-message-container">
+      {errorMessage && <div className="text-danger">{errorMessage}</div>}
       </div>
       <div className="form-container">
         <form onSubmit={handleSubmit} className="login-form">
@@ -178,6 +194,15 @@ const Class = ({ onClassAdded }) => {
                 placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <div className="col-md-12">
+              <textarea
+                style={{backgroundColor: '#fff'}}
+                className="form-control"
+                placeholder="Group Number"
+                value={group}
+                onChange={(e) => setGroup(e.target.value)}
               />
             </div>
             <div className="col-md-6">
@@ -202,7 +227,6 @@ const Class = ({ onClassAdded }) => {
             </div>
           </div>
           <button type="submit" className="btn btn-primary" style={{backgroundColor: "#333", borderStyle: "none", marginBottom: "30px"}}>Add Class</button>
-          {errorMessage && <div className="text-danger">{errorMessage}</div>}
         </form>
       </div>
       <div>
@@ -216,20 +240,13 @@ const Class = ({ onClassAdded }) => {
               >
                 <div>{classItem.name}</div>
                 <div>{classItem.description}</div>
+                <div>{classItem.group}</div>
                 <div>{classItem.startYear} - {classItem.endYear}</div>
               </div>
             </li>
           ))}
         </ul>
       </div>
-      {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <p>Class added successfully!</p>
-            <button onClick={() => setShowPopup(false)}>Close</button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };

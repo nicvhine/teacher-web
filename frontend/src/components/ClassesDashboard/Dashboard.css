@@ -14,6 +14,7 @@
 .side-navbar ul {
   list-style-type: none;
   padding: 0;
+  margin-bottom: 30px;
 }
 
 .side-navbar li {
@@ -49,3 +50,4 @@
 .class-info p {
   margin-bottom: 5px;
 }
+

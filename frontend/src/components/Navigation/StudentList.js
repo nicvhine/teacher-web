@@ -28,7 +28,9 @@ const StudentList = ({ onStudentAdded }) => {
     fetchStudents();
   }, [classId]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+    
     try {
       if (!name.trim() || !email.trim()) {
         setErrorMessage('Name and email cannot be empty.');
@@ -41,13 +43,14 @@ const StudentList = ({ onStudentAdded }) => {
       });
 
       console.log("Student added successfully");
-      onStudentAdded();
+      onStudentAdded(); // Invoke onStudentAdded function after successful addition
       setName("");
       setEmail("");
-      setErrorMessage("");
+      setErrorMessage(""); // Clear error message on success
       setShowPopup(true);
     } catch (error) {
       console.error("Error adding student:", error);
+      setErrorMessage('Error adding student. Please try again.'); // Set error message on failure
     }
   };
 
@@ -55,7 +58,6 @@ const StudentList = ({ onStudentAdded }) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
     handleStatusChange(studentId, newStatus);
   };
-
 
   const handleStatusChange = async (studentId, newStatus) => {
     try {

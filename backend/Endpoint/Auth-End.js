@@ -39,13 +39,12 @@ router.get('/users', (req, res) => {
 });
 
 router.post('/users', (req, res) => {
-    const { email, username, password } = req.body;
-    console.log('register')
-    if (!email || !username || !password) {
-        return res.status(400).json({ error: 'Email, username, and password are required' });
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    taskRepo.addUser(email, username, password, (err, result) => {
+    taskRepo.addUser(email, password, (err, result) => {
         if (err) {
             console.error('Failed to add user:', err);
             res.status(500).json({ error: 'Failed to add user' });
@@ -70,9 +69,9 @@ router.post('/login', (req, res) => {
         }
 
         if (!user) {
+            console.log('user not found')
             return res.status(404).json({ error: 'User not found' });
         }
-
         try {
             const isPasswordValid = password === user.password;
 
@@ -123,12 +122,12 @@ router.post('/logout', (req, res) => {
 
 //CLASS
 router.post('/class', (req, res) => {
-    const { name, description, startYear, endYear } = req.body;
-    if (!name || !description || !startYear || !endYear) {
-        return res.status(400).json({ error: 'Name, description, startYear, and endYear are required' });
+    const { name, description, group, startYear, endYear } = req.body;
+    if (!name || !description || !group || !startYear || !endYear) {
+        return res.status(400).json({ error: 'All fields are required.' });
     }
 
-    taskRepo.addClass(name, description, startYear, endYear, (err, result) => {
+    taskRepo.addClass(name, description, group, startYear, endYear, (err, result) => {
         if (err) {
             console.error('Failed to add class:', err);
             res.status(500).json({ error: 'Failed to add class' });

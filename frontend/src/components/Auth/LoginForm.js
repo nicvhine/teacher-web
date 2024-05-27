@@ -27,13 +27,19 @@ const LoginForm = () => {
         const userData = response.data.user;
         console.log('Login successful:', userData);
         setLoggedIn(true);
-      } else {
-        console.error('Login failed:', response.data.error);
-        setErrorMessage('Login failed. Please check your credentials.');
       }
+      // else {
+      //   console.error('Login failed:', response.data.error);
+      //   setErrorMessage('Login failed. Please check your credentials.');
+      // }
     } catch (error) {
-      console.error('Error during login:', error);
-      setErrorMessage('An error occurred during login. Please try again later.');
+      if (error.response.data.error) {
+        console.info('Error during login: ', error.response.data.error);
+        setErrorMessage(error.response.data.error);
+      } else {
+        console.info('Error during login');
+        setErrorMessage('An error occurred during login. Please try again later.');
+      }
     }
   };
 

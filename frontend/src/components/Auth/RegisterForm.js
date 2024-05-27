@@ -4,37 +4,54 @@ import { Navigate, Link } from "react-router-dom";
 import { SERVER_URL } from "../../Url";
 import "./Auth.scss";
 
-
 const RegisterForm = ({ onUserAdded }) => {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent default form submission
+  
+    // Reset messages
+    setErrorMessage("");
+    setSuccessMessage("");
+    setLoading(true);
+  
     try {
-      if (!email.trim() || !username.trim() || !password.trim()) {
-        setErrorMessage("Email, username, and password cannot be empty.");
+      if (!email.trim() || !password.trim()) {
+        setErrorMessage("Email and password cannot be empty.");
+        setLoading(false);
         return;
       }
-
-      await axios.post(`${SERVER_URL}/api/users`, {
+  
+      // Send registration request
+      const response = await axios.post(`${SERVER_URL}/api/users`, {
         email,
-        username,
         password,
       });
-      console.log("User added successfully");
-      onUserAdded();
-      setEmail("");
-      setUsername("");
-      setPassword("");
-      setErrorMessage("");
-
-      setShowPopup(true);
+  
+      if (response.status === 201) {
+        setSuccessMessage("User registered successfully!");
+        onUserAdded(); // Notify parent component
+        setEmail("");
+        setPassword("");
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
+      }
     } catch (error) {
-      console.error("Error adding user:", error);
+      if (error.response) {
+        const responseData = error.response.data;
+        if (responseData.error === "Email already taken") {
+          setErrorMessage("This email is already registered. Please use a different email.");
+        } else {
+          setErrorMessage(responseData.error || "Something went wrong.");
+        }
+      } 
     }
+  
+    setLoading(false);
   };
 
   return (
@@ -51,6 +68,9 @@ const RegisterForm = ({ onUserAdded }) => {
           }
           .error-message {
             color: red;
+          }
+          .success-message {
+            color: green;
           }
           .card{
             border: none;
@@ -88,6 +108,9 @@ const RegisterForm = ({ onUserAdded }) => {
                 {errorMessage && (
                   <div className="error-message">{errorMessage}</div>
                 )}
+                {successMessage && (
+                  <div className="success-message">{successMessage}</div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                   <div className="row">
@@ -103,18 +126,7 @@ const RegisterForm = ({ onUserAdded }) => {
                         />
                       </div>
                     </div>
-                    <div className="col-md-12 mb-4">
-                      <div className="form-outline">
-                        <input
-                          style={{backgroundColor: '#fff'}}
-                          type="text"
-                          className="form-control" 
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          placeholder="Username"
-                        />
-                      </div>
-                    </div>
+      
                     <div className="col-md-12 mb-4">
                       <div className="form-outline">
                         <input
@@ -132,8 +144,9 @@ const RegisterForm = ({ onUserAdded }) => {
                     <button
                       type="submit"
                       className="btn btn-primary btn-block mb-4"
+                      disabled={loading}
                     >
-                      Register
+                      {loading ? "Loading..." : "Register"}
                     </button>
                     <p style={{ color: "#000" }}>
                       Already registered?{" "}

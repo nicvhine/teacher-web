@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 
 
 //USER
-const addUser = (email, username, password, callback) => {
-    const sql = 'INSERT INTO users (email, username, password) VALUES (?, ?, ?)';
-    pool.query(sql, [email, username, password], (err, result) => {
+const addUser = (email, password, callback) => {
+    const sql = 'INSERT INTO users (email, password) VALUES (?, ?)';
+    pool.query(sql, [email, password], (err, result) => {
         if (err) {
             console.error('Error adding user:', err);
             callback(err);
@@ -35,16 +35,16 @@ const getUserByEmail = (email, callback) => {
             return callback(err);
         }
         if (results.length === 0) {
-            return callback(null, null); 
+            return callback(null, null);
         }
         callback(null, results[0]); 
     });
 };
 
 //CLASS
-const addClass = (name, description, startYear, endYear, callback) => {
-    const sql = 'INSERT INTO classes (name, description, startYear, endYear) VALUES (?, ?, ?, ?)';
-    pool.query(sql, [name, description, startYear, endYear], (err, result) => {
+const addClass = (name, description, group, startYear, endYear, callback) => {
+    const sql = 'INSERT INTO classes (name, description, `group`, startYear, endYear) VALUES (?, ?, ?, ?, ?)';
+    pool.query(sql, [name, description, group, startYear, endYear], (err, result) => {
         if (err) {
             console.error('Error adding class:', err);
             callback(err);

@@ -1,95 +1,171 @@
-import React, { useState } from "react";
+// Import React and other necessary modules
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import Sidebar from "../ClassesDashboard/Dashboard";
 import { SERVER_URL } from "../../Url";
-import "./Settings.css";
+import { useParams, Link} from "react-router-dom";
+import Sidebar from "../ClassesDashboard/Dashboard";
+import "./Tasks.css";
 
-const Settings = () => {
+const Settings = ({ onTaskAdded }) => {
   const { classId } = useParams();
-  const [className, setClassName] = useState("");
-  const [classDescription, setClassDescription] = useState("");
+  const [classInfo, setClassInfo] = useState(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [startYear, setStartYear] = useState("");
   const [endYear, setEndYear] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [tasks, setTasks] = useState([]);
 
-  const handleSaveChanges = async () => {
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get(
+          `${SERVER_URL}/api/class/${classId}/tasks`
+        );
+        setTasks(response.data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, [classId]);
+
+  const fetchClassInfo = async (id) => {
     try {
-      const response = await axios.put(`${SERVER_URL}/api/class/${classId}`, {
-        name: className,
-        description: classDescription,
-        startYear,
-        endYear
-      });
-      console.log(response.data); 
-      
+      const [classResponse, studentCountResponse] = await Promise.all([
+        axios.get(`${SERVER_URL}/api/class/${id}`),
+      ]);
+      setClassInfo(classResponse.data);
+      if (!name) setName(classResponse.data.name);
+      if (!description) setDescription(classResponse.data.description);
+      if (!startYear) setStartYear(classResponse.data.startYear);
+      if (!endYear) setEndYear(classResponse.data.endYear);
     } catch (error) {
-      console.error("Error saving changes:", error);
+      console.error("Error fetching class info:", error);
     }
   };
 
-  const handleDeleteClass = async () => {
+  useEffect(() => {
+    if (classId) {
+      fetchClassInfo(classId);
+    }
+  }, [classId]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (!name.trim() || !description.trim() || !startYear || !endYear) {
+        setErrorMessage("Fields cannot be empty.");
+        return;
+      }
+
+      await axios.put(`${SERVER_URL}/api/class/${classId}`, {
+        name,
+        description,
+        startYear,
+        endYear,
+      });
+
+      console.log("Class details updated successfully");
+      setErrorMessage("");
+      setShowPopup(true);
+    } catch (error) {
+      console.error("Error updating class details:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${SERVER_URL}/api/class/${classId}`);
+      console.log("Class deleted successfully");
+    } catch (error) {
+      console.error("Error deleting class:", error);
+    }
   };
 
   return (
-    <div className="settings-container">
+    <div className="task-management-container">
       <nav className="side-navbar">
         <Sidebar />
       </nav>
-      <div className="settings-content">
-        <h1 className="settings-title">Settings</h1>
-        <div className="edit-class">
-          <h2 className="section-title">Edit Class Details</h2>
-          <div className="form-group">
-            <label htmlFor="className">Name:</label>
+      <div className="task-management-content">
+        <h2>Edit Class Details</h2>
+        <form onSubmit={handleSubmit} className="task-form">
+          <p>Class Name</p>
+          <input
+            style={{ width: "10%", marginBottom: "10px" }}
+            type="text"
+            name="name"
+            placeholder={classInfo ? classInfo.name : "Class Name"}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <p>Class Description</p>
+          <div>
             <input
+              style={{ width: "50%", marginBottom: "10px" }}
               type="text"
-              id="className"
-              name="className"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
+              name="description"
+              placeholder={
+                classInfo ? classInfo.description : "Class Description"
+              }
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="classDescription">Description:</label>
-            <textarea
-              id="classDescription"
-              name="classDescription"
-              rows="4"
-              value={classDescription}
-              onChange={(e) => setClassDescription(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="startYear">Start Year:</label>
+          <div>
+            <p>Class Year</p>
             <input
+              style={{ width: "10%", marginBottom: "10px" }}
               type="text"
-              id="startYear"
               name="startYear"
+              placeholder={
+                classInfo ? classInfo.startYear : "Year"
+              }
               value={startYear}
               onChange={(e) => setStartYear(e.target.value)}
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="endYear">End Year:</label>
             <input
+              style={{ width: "10%", marginBottom: "10px" }}
               type="text"
-              id="endYear"
               name="endYear"
+              placeholder={
+                classInfo ? classInfo.endYear : "Year"
+              }
               value={endYear}
               onChange={(e) => setEndYear(e.target.value)}
             />
           </div>
-          <button className="btn" onClick={handleSaveChanges}>
-            Save Changes
-          </button>
-        </div>
-        <div className="delete-class">
-          <h2 className="section-title">Delete Class</h2>
-          <p>Are you sure you want to delete this class?</p>
-          <button className="btn delete-btn" onClick={handleDeleteClass}>
-            Delete Class
-          </button>
-        </div>
+          <div>
+            <button
+              type="submit"
+              className="add-task-button"
+            >
+              Update Class
+            </button>
+            <Link
+              to="/class"
+              className="delete-task-button"
+              onClick={handleDelete}
+              style={{
+                textDecoration: 'none',
+                padding: "12px 15px",
+                margin: "5px",
+                backgroundColor: "red",
+                color: "white",
+                border: "none",
+                borderRadius: "3px",
+                cursor: "pointer"
+              }}
+            >
+              Delete Class
+            </Link>
+
+
+          </div>
+        </form>
       </div>
     </div>
   );

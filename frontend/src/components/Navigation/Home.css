@@ -1,9 +1,37 @@
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  margin-left: 200px;
+  margin-top: 50px;
+}
+
 .name-description-container {
-    margin-top: 0;
-  }
-  
-  .student-count-box {
-    padding: 10px;
-    margin-top: 20px;
-  }
-  
+  text-align: center;
+}
+
+.name-description-container h1 {
+  margin-bottom: 10px;
+}
+
+.name-description-container h2 {
+  margin-bottom: 20px;
+}
+
+.numberStudents {
+  margin-top: 50px;
+}
+
+.clock-container {
+  margin-top: 20px;
+  font-size: 40px;
+  color: red;
+}
+
+.calendar-container {
+  margin-top: 20px;
+}
+
+
+
