@@ -4,9 +4,9 @@ import axios from "axios";
 import { SERVER_URL } from "../../Url";
 import { useParams, Link} from "react-router-dom";
 import Sidebar from "../ClassesDashboard/Dashboard";
-import "./Tasks.css";
+import "./Settings.css";
 
-const Settings = ({ onTaskAdded }) => {
+const Settings = ({ }) => {
   const { classId } = useParams();
   const [classInfo, setClassInfo] = useState(null);
   const [name, setName] = useState("");
@@ -15,8 +15,7 @@ const Settings = ({ onTaskAdded }) => {
   const [endYear, setEndYear] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
-  const [tasks, setTasks] = useState([]);
+  const [ setTasks] = useState([]);
 
   useEffect(() => {
     const fetchTasks = async () => {

@@ -12,7 +12,6 @@ const TaskManagement = ({ onTaskAdded }) => {
   const [due_date, setDueDate] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");

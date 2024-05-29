@@ -23,3 +23,18 @@
 button:hover, .delete-task-button:hover {
     background-color: #0056b3;
 }
+
+.error-message-container{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-right:20%;
+
+}
+
+.success-message-container{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-right: 6%;
+}
