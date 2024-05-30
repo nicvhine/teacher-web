@@ -3,8 +3,7 @@ import axios from "axios";
 import { SERVER_URL } from "../../Url";
 import { Link } from "react-router-dom";
 
-
-const Class = ({ onClassAdded = () => {}}) => {
+const Class = ({ onClassAdded = () => {} }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [group, setGroup] = useState('');
@@ -14,62 +13,86 @@ const Class = ({ onClassAdded = () => {}}) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [classes, setClasses] = useState([]);
 
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
   const fetchClasses = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/api/class`);
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        // Handle case where access token is missing
+        console.error('Access token is missing');
+        return;
+      }
+
+      const response = await axios.get(`${SERVER_URL}/api/class`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       setClasses(response.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
     }
   };
 
-  useEffect(() => {
-    fetchClasses();
-  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        if (!name.trim() || !description.trim() || !group.trim() || !startYear.trim() || !endYear.trim()) {
-            setErrorMessage('All fields are required');
-            return;
+      if (!name.trim() || !description.trim() || !group.trim() || !startYear.trim() || !endYear.trim()) {
+        setErrorMessage('All fields are required');
+        return;
+      }
+
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token is missing');
+        return;
+      }
+
+      await axios.post(`${SERVER_URL}/api/class`, {
+        name,
+        description,
+        group,
+        startYear,
+        endYear
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         }
+      });
 
-        await axios.post(`${SERVER_URL}/api/class`, {
-            name,
-            description,
-            group,
-            startYear,
-            endYear
-        });
+      console.log("Class added successfully");
+      onClassAdded();
+      setName("");
+      setDescription("");
+      setGroup("");
+      setStartYear("");
+      setEndYear("");
+      setErrorMessage("");
+      setSuccessMessage("Class added successfully");
+      fetchClasses();
 
-        console.log("Class added successfully");
-        onClassAdded();
-        setName("");
-        setDescription("");
-        setGroup("");
-        setStartYear("");
-        setEndYear("");
-        setErrorMessage("");
-        setSuccessMessage("Class added successfully");
-        fetchClasses();
-        
     } catch (error) {
-        console.error("Error adding class", error);
-        if (error.response && error.response.status === 409) {
-            setErrorMessage("A class with the same name and group already exists.");
-        } else {
-            setErrorMessage("Error adding class. Please try again later.");
-        }
+      console.error("Error adding class", error);
+      if (error.response && error.response.status === 409) {
+        setErrorMessage("A class with the same name and group already exists.");
+      } else {
+        setErrorMessage("Error adding class. Please try again later.");
+      }
     }
-};
+  };
 
-
-  
   const handleClassItemClick = (classId) => {
     window.location.href = `/dashboard/${classId}`;
     console.log(`Clicked on class with ID: ${classId}`);
   };
+
 
   return (
     <section className="background-radial-gradient overflow-hidden">
@@ -188,7 +211,7 @@ const Class = ({ onClassAdded = () => {}}) => {
         `}
       </style>
       <div className="logout-container">
-        <Link to="/" className="logout-icon">Logout</Link>
+        <Link to="/" className="logout-icon" onClick={handleLogout}>Logout</Link>
       </div>
       <div className="error-message-container">
       {errorMessage && <div className="text-danger">{errorMessage}</div>}

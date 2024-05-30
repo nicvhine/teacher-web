@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
 import axios from "axios";
-import { SERVER_URL } from "../../Url";
+import { Link, useParams } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import Sidebar from "../ClassesDashboard/Dashboard";
 import "./Home.css";
+import { SERVER_URL } from "../../Url";
 
 const Dashboard = () => {
   const { classId } = useParams();
@@ -16,16 +16,35 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchClassInfo = async (id) => {
       try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          console.error('Access token is missing');
+          return;
+        }
+
         const [classResponse, studentCountResponse, taskCountResponse] = await Promise.all([
-          axios.get(`${SERVER_URL}/api/class/${id}`),
-          axios.get(`${SERVER_URL}/api/class/${id}/studentCount`),
-          axios.get(`${SERVER_URL}/api/class/${id}/taskCount`),
+          axios.get(`${SERVER_URL}/api/class/${id}`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }),
+          axios.get(`${SERVER_URL}/api/class/${id}/studentCount`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }),
+          axios.get(`${SERVER_URL}/api/class/${id}/taskCount`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }),
         ]);
         setClassInfo(classResponse.data);
         setStudentCount(studentCountResponse.data.studentCount);
         setTaskCount(taskCountResponse.data.taskCount);
       } catch (error) {
         console.error("Error fetching class info:", error);
+        // Handle error gracefully, show a message, or retry fetching
       }
     };
 

@@ -25,13 +25,12 @@ const LoginForm = () => {
 
       if (response.status === 200) {
         const userData = response.data.user;
+        const accessToken = response.data.accessToken; // Retrieve access token from response
         console.log('Login successful:', userData);
+        // Store access token in local storage
+        localStorage.setItem('accessToken', accessToken);
         setLoggedIn(true);
       }
-      // else {
-      //   console.error('Login failed:', response.data.error);
-      //   setErrorMessage('Login failed. Please check your credentials.');
-      // }
     } catch (error) {
       if (error.response.data.error) {
         console.info('Error during login: ', error.response.data.error);
@@ -46,7 +45,6 @@ const LoginForm = () => {
   if (loggedIn) {
     return <Navigate to="/class" />;
   }
-
   return (
     <section className="background-radial-gradient overflow-hidden">
       <style>

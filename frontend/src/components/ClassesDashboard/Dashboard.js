@@ -11,10 +11,8 @@ const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    if (classId) {
-      fetchClassInfo(classId);
-    }
-
+    fetchClassInfo(classId);
+    
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -24,11 +22,25 @@ const Dashboard = () => {
 
   const fetchClassInfo = async (id) => {
     try {
-      const response = await axios.get(`${SERVER_URL}/api/class/${id}`);
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token is missing');
+        return;
+      }
+
+      const response = await axios.get(`${SERVER_URL}/api/class/${id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       setClassInfo(response.data);
     } catch (error) {
       console.error('Error fetching class info:', error);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
   };
 
   return (
@@ -62,7 +74,7 @@ const Dashboard = () => {
             </li>
           )} 
           <li className="mb-3">
-            <Link className="text-white" to="/">Logout</Link>
+            <Link className="text-white" to="/" onClick={handleLogout}>Logout</Link>
           </li>
         </ul>
       </nav>

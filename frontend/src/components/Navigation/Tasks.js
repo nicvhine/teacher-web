@@ -16,25 +16,41 @@ const TaskManagement = ({ onTaskAdded }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  useEffect(() => {
+    fetchTasks();
+  }, [classId]);
+
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(`${SERVER_URL}/api/class/${classId}/tasks`);
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token is missing');
+        return;
+      }
+
+      const response = await axios.get(`${SERVER_URL}/api/class/${classId}/tasks`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       setTasks(response.data); 
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      console.error("Error fetching students:", error);
     }
   };
-
-  useEffect(() => {
-  fetchTasks();
-}, [classId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      if (!title.trim() || !description.trim() || !due_date.trim) {
+      if (!title.trim() || !description.trim() || !due_date.trim()) { 
         setErrorMessage('Fields cannot be empty.');
+        return;
+      }
+
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token is missing');
         return;
       }
 
@@ -42,6 +58,10 @@ const TaskManagement = ({ onTaskAdded }) => {
         title,
         description,
         due_date 
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}` // Use accessToken instead of token
+        }
       });
 
       console.log("Task added successfully");
@@ -58,10 +78,10 @@ const TaskManagement = ({ onTaskAdded }) => {
         if (error.response && error.response.status === 409) {
             setErrorMessage("Information provided already exists");
         } else {
-            setErrorMessage("Error adding student. Please try again later.");
+            setErrorMessage("Error adding task. Please try again later."); // Corrected error message
         }
     }
-};
+  };
 
   const toggleStatus = async (taskId, currentStatus) => {
     try {
@@ -80,9 +100,7 @@ const TaskManagement = ({ onTaskAdded }) => {
       console.error("Error toggling task status:", error);
     }
   };
-  
-  
-  
+
   const filteredTasks = tasks
     .filter(task => {
       const searchMatch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

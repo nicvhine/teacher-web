@@ -1,6 +1,3 @@
-/* eslint-disable */
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
@@ -12,25 +9,37 @@ const StudentList = ({ onStudentAdded = () => {} }) => {
   const { classId } = useParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
+  const [statusFilter, setStatusFilter] = useState('all');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [students, setStudents] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get(`${SERVER_URL}/api/class/${classId}/students`);
-        setStudents(response.data); 
-      } catch (error) {
-        console.error("Error fetching students:", error);
-      }
-    };
-
-    useEffect(() => {
+  useEffect(() => {
     fetchStudents();
   }, [classId]);
+
+  const fetchStudents = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token is missing');
+        return;
+      }
+
+      const response = await axios.get(`${SERVER_URL}/api/class/${classId}/students`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      setStudents(response.data); 
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -40,12 +49,22 @@ const StudentList = ({ onStudentAdded = () => {} }) => {
         setErrorMessage('Name and email cannot be empty.');
         return;
       }
-
+  
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        console.error('Access token is missing');
+        return;
+      }
+  
       await axios.post(`${SERVER_URL}/api/class/${classId}/students`, {
         name,
         email
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}` // Use accessToken instead of token
+        }
       });
-
+  
       console.log("Student added successfully");
       onStudentAdded(); 
       setName("");
@@ -53,17 +72,17 @@ const StudentList = ({ onStudentAdded = () => {} }) => {
       setErrorMessage(""); 
       setSuccessMessage("Student added successfully");
       fetchStudents();
-
+  
     } catch (error) {
-        console.error("Error adding student", error);
-        if (error.response && error.response.status === 409) {
-            setErrorMessage("A student with the same email already exists.");
-        } else {
-            setErrorMessage("Error adding student. Please try again later.");
-        }
+      console.error("Error adding student", error);
+      if (error.response && error.response.status === 409) {
+        setErrorMessage("A student with the same email already exists.");
+      } else {
+        setErrorMessage("Error adding student. Please try again later.");
+      }
     }
-};
-
+  };
+  
   const toggleStatus = (studentId, currentStatus) => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
     handleStatusChange(studentId, newStatus);
