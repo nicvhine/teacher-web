@@ -25,9 +25,8 @@ const LoginForm = () => {
 
       if (response.status === 200) {
         const userData = response.data.user;
-        const accessToken = response.data.accessToken; // Retrieve access token from response
+        const accessToken = response.data.accessToken; 
         console.log('Login successful:', userData);
-        // Store access token in local storage
         localStorage.setItem('accessToken', accessToken);
         setLoggedIn(true);
       }
