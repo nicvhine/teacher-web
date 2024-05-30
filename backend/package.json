@@ -22,7 +22,8 @@
         "mongoose": "^8.3.4",
         "mysql": "^2.18.1",
         "nodemon": "^3.1.0",
-        "path": "^0.12.7"
+        "path": "^0.12.7",
+        "react-bootstrap": "^2.10.2"
     },
     "devDependencies": {
         "supertest": "^7.0.0"

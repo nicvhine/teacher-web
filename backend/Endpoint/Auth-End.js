@@ -3,6 +3,7 @@ const router = express.Router();
 const taskRepo = require('../Repository/Auth-Repo');
 const jwt =require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { auth } = require('firebase-admin');
 const JWT_SECRET = process.env.JWT_SECRET || 'd0b5feeacfec370cef52f5a87597ed14f463537703a61011585d7d18cc59d21f';
 
 // Authentication Middleware
@@ -16,19 +17,6 @@ const authenticateToken = (req, res, next) => {
     if (token == null) return res.sendStatus(401);
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-};
-
-// Middleware to authenticate access token
-const authenticateAccessToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const accessToken = authHeader && authHeader.split(' ')[1];
-    if (!accessToken) return res.sendStatus(401);
-
-    jwt.verify(accessToken, JWT_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
         req.user = user;
         next();
@@ -139,7 +127,7 @@ router.post('/logout', (req, res) => {
 
 
 //CLASS
-router.post('/class', (req, res) => {
+router.post('/class', authenticateToken,(req, res) => {
     const { name, description, group, startYear, endYear } = req.body;
     if (!name || !description || !group || !startYear || !endYear) {
         return res.status(400).json({ error: 'All fields are required.' });
@@ -160,7 +148,7 @@ router.post('/class', (req, res) => {
 });
 
 
-router.get('/class/:id', (req, res) => {
+router.get('/class/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
     taskRepo.getClassById(id, (err, classDetails) => {
         if (err) {
@@ -172,7 +160,7 @@ router.get('/class/:id', (req, res) => {
     });
 });
 
-router.get('/class', (req, res) => {
+router.get('/class', authenticateToken, (req, res) => {
     taskRepo.getClasses((err, classes) => {
         if (err) {
             console.error('Failed to fetch classes:', err);
@@ -183,7 +171,7 @@ router.get('/class', (req, res) => {
     });
 });
 
-router.put('/class/:id', (req, res) => {
+router.put('/class/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
     const { name, description, startYear, endYear } = req.body;
     if (!name || !description || !startYear || !endYear) {
@@ -211,7 +199,7 @@ router.put('/class/:id', (req, res) => {
 });
 
 // Delete Class
-router.delete('/class/:classId', (req, res) => {
+router.delete('/class/:classId',authenticateToken, (req, res) => {
     const { classId } = req.params;
     
     taskRepo.getClassById(classId, (err, classDetails) => {
@@ -237,7 +225,7 @@ router.delete('/class/:classId', (req, res) => {
 
 //STUDENTS
 
-router.post('/class/:classId/students', (req, res) => {
+router.post('/class/:classId/students', authenticateToken, (req, res) => {
     const { classId } = req.params;
     const { name, email } = req.body;
     if (!name || !email) {
@@ -282,7 +270,7 @@ router.get('/class/:id/taskCount', (req, res) => {
 });
 
 
-router.get('/class/:classId/students', (req, res) => {
+router.get('/class/:classId/students', authenticateToken, (req, res) => {
     const { classId } = req.params;
     taskRepo.getStudentsForClass(classId, (err, students) => {
         if (err) {
@@ -294,7 +282,7 @@ router.get('/class/:classId/students', (req, res) => {
     });
 });
 
-router.put('/class/:classId/students/:studentId/status', (req, res) => {
+router.put('/class/:classId/students/:studentId/status',authenticateToken, (req, res) => {
     const { classId, studentId } = req.params;
     const { status } = req.body;
     if (!status) {
@@ -312,7 +300,7 @@ router.put('/class/:classId/students/:studentId/status', (req, res) => {
 });
 
 // TASK
-router.post('/class/:classId/tasks', (req, res) => {
+router.post('/class/:classId/tasks', authenticateToken, (req, res) => {
     const { classId } = req.params;
     const { title, description, due_date } = req.body;
     if (!title || !description || !due_date) {
@@ -333,7 +321,7 @@ router.post('/class/:classId/tasks', (req, res) => {
 });
 
 
-router.get('/class/:classId/tasks', (req, res) => {
+router.get('/class/:classId/tasks', authenticateToken, (req, res) => {
     const { classId } = req.params;
     taskRepo.getTasks(classId, (err, students) => {
         if (err) {
@@ -345,7 +333,7 @@ router.get('/class/:classId/tasks', (req, res) => {
     });
 });
 
-router.put('/class/:classId/tasks/:id/status', (req, res) => {
+router.put('/class/:classId/tasks/:id/status', authenticateToken, (req, res) => {
     const { classId, id } = req.params;
     const { status } = req.body;
     if (!status) {
