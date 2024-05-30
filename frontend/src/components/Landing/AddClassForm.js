@@ -21,7 +21,6 @@ const Class = ({ onClassAdded = () => {} }) => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       if (!accessToken) {
-        // Handle case where access token is missing
         console.error('Access token is missing');
         return;
       }

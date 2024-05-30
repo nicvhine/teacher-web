@@ -61,7 +61,7 @@ const StudentList = ({ onStudentAdded = () => {} }) => {
         email
       }, {
         headers: {
-          Authorization: `Bearer ${accessToken}` // Use accessToken instead of token
+          Authorization: `Bearer ${accessToken}` 
         }
       });
   

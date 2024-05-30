@@ -60,7 +60,7 @@ const TaskManagement = ({ onTaskAdded }) => {
         due_date 
       }, {
         headers: {
-          Authorization: `Bearer ${accessToken}` // Use accessToken instead of token
+          Authorization: `Bearer ${accessToken}` 
         }
       });
 
@@ -78,7 +78,7 @@ const TaskManagement = ({ onTaskAdded }) => {
         if (error.response && error.response.status === 409) {
             setErrorMessage("Information provided already exists");
         } else {
-            setErrorMessage("Error adding task. Please try again later."); // Corrected error message
+            setErrorMessage("Error adding task. Please try again later."); 
         }
     }
   };
