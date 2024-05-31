@@ -323,12 +323,12 @@ router.post('/class/:classId/tasks', authenticateToken, (req, res) => {
 
 router.get('/class/:classId/tasks', authenticateToken, (req, res) => {
     const { classId } = req.params;
-    taskRepo.getTasks(classId, (err, students) => {
+    taskRepo.getTasks(classId, (err, tasks) => {
         if (err) {
-            console.error('Failed to fetch students:', err);
-            res.status(500).json({ error: 'Failed to fetch students' });
+            console.error('Failed to fetch tasks:', err);
+            res.status(500).json({ error: 'Failed to fetch tasks' });
         } else {
-            res.json(students);
+            res.status(200).json(tasks);
         }
     });
 });

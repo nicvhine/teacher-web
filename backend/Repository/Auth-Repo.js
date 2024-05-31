@@ -1,7 +1,6 @@
 const pool = require('../Database');
 const jwt = require('jsonwebtoken');
 
-
 //USER
 const addUser = (email, password, callback) => {
     const checkDuplicateSql = 'SELECT * FROM users WHERE email = ?';
@@ -286,5 +285,5 @@ module.exports = {
     addTasks,
     getTasks,
     updateTaskStatus,
-    getTaskCountForClass
+    getTaskCountForClass,
 };
